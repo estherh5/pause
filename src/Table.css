@@ -1,0 +1,48 @@
+table {
+  width: 250px;
+  border-collapse: collapse;
+  margin-right: 40px;
+  text-align: center;
+}
+
+th {
+  border-bottom: 1px solid #dddddd;
+  padding: 10px;
+  font-size: 14px;
+}
+
+td {
+  padding: 5px;
+  font-size: 14px;
+}
+
+.hours {
+  width: 70px;
+}
+
+#empty-hours {
+  margin-right: 15px;
+}
+
+td button:hover {
+  text-shadow: 0.2px 0.2px 0px #000000;
+}
+
+td button:active {
+  text-shadow: 0.5px 0.5px 0px #000000;
+}
+
+.delete {
+  visibility: hidden;
+  font-size: 14px;
+}
+
+tr:hover td .delete {
+  visibility: visible;
+}
+
+.error {
+  margin-top: 5px;
+  color: #ff0000;
+  font-size: 10px;
+}

@@ -1,0 +1,25 @@
+#button-container button {
+  padding: 5px;
+  border-radius: 5px;
+  margin: 5px;
+  box-shadow: 1px 1px 1px #000000;
+  visibility: visible;
+  background-color: #0edc00;
+  font-size: 15px;
+}
+
+#button-container button:hover {
+  background-color: #0db902;
+}
+
+#button-container button:active {
+  box-shadow: none !important;
+}
+
+#Clear {
+  background-color: #ff0000 !important;
+}
+
+#Clear:hover {
+  background-color: #da0101 !important;
+}
