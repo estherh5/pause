@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import Header from './Header.js'
 import Table from './Table.js'
 import Chart from './Chart.js'
 import StarterButtons from './StarterButtons.js'
@@ -221,22 +222,25 @@ class App extends Component {
 
   render() {
     return (
-      <div id="app-container">
-        <h1 id="title">
-          <a href=".">Pause</a>
-        </h1>
-        <h2 id="subtitle">How do you want to spend your day?</h2>
-        <div id="data-container">
-          <Table
-            activities={this.state.activities}
-            onLabelEdit={this.updateLabel}
-            onHoursEdit={this.updateHours}
-            onAddActivity={this.addActivity}
-            onDeleteActivity={this.removeActivity} />
-          <Chart activities={this.state.activities} />
-        </div>
-        <div id="button-container">
-          <StarterButtons onButtonClick={this.replaceActivities} />
+      <div>
+        <Header />
+        <div id="app-container">
+          <h1 id="title">
+            <a href=".">Pause</a>
+          </h1>
+          <h2 id="subtitle">How do you want to spend your day?</h2>
+          <div id="data-container">
+            <Table
+              activities={this.state.activities}
+              onLabelEdit={this.updateLabel}
+              onHoursEdit={this.updateHours}
+              onAddActivity={this.addActivity}
+              onDeleteActivity={this.removeActivity} />
+            <Chart activities={this.state.activities} />
+          </div>
+          <div id="button-container">
+            <StarterButtons onButtonClick={this.replaceActivities} />
+          </div>
         </div>
       </div>
     );
