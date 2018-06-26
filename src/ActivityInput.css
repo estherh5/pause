@@ -6,11 +6,6 @@ input {
   text-align: center;
 }
 
-input:focus {
-  outline-color: #0edc00;
-  outline-width: 2px;
-}
-
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;

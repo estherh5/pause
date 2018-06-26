@@ -37,6 +37,11 @@ a:hover {
   color: #0edc00;
 }
 
+*:focus {
+  outline-color: #0edc00;
+  outline-width: 2px;
+}
+
 ::placeholder {
   font-style: italic;
 }
@@ -46,11 +51,6 @@ button {
   border: none;
   font-family: 'Raleway', sans-serif;
   cursor: pointer;
-}
-
-button:focus {
-  outline-color: #0edc00;
-  outline-width: 2px;
 }
 
 button:active {
