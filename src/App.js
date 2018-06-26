@@ -5,6 +5,7 @@ import Header from './Header.js'
 import Table from './Table.js'
 import Chart from './Chart.js'
 import StarterButtons from './StarterButtons.js'
+import Calculator from './Calculator.js'
 
 // Main app that contains all components
 class App extends Component {
@@ -271,6 +272,7 @@ class App extends Component {
           <div id="button-container">
             <StarterButtons onButtonClick={this.replaceActivities} />
           </div>
+          <Calculator activities={this.state.activities} />
         </div>
       </div>
     );
