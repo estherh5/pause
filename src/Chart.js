@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './Chart.css';
-import Please from './Please.js';
 import {Pie, defaults} from 'react-chartjs-2';
 
 // Set default chart font
@@ -34,20 +33,9 @@ class Chart extends Component {
       return obj.value;
     });
 
-    // Set base color to make a color palette from
-    const base_color = Please.make_color({
-      saturation: 1,
-      value: 1,
-      golden: true,
-      format: 'hsv'
+    let colors = activities.map(function (obj) {
+      return obj.color;
     });
-
-    // Create color palette
-    const colors = Please.make_scheme(base_color[0],
-      {scheme_type: 'analogous'}, activities.length - 1);
-
-    // Add starting value for empty activity to color palette
-    colors.unshift(activities[0].color);
 
     const chartData = {
       labels: labels,

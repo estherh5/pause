@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import Please from './Please.js';
 import Header from './Header.js'
 import Table from './Table.js'
 import Chart from './Chart.js'
@@ -24,6 +25,7 @@ class App extends Component {
     this.updateHours = this.updateHours.bind(this);
     this.removeActivity = this.removeActivity.bind(this);
     this.replaceActivities = this.replaceActivities.bind(this);
+    this.setColors = this.setColors.bind(this);
   }
 
   // Add activity to activities array
@@ -52,7 +54,7 @@ class App extends Component {
       currentActivities[newIndex].value = newActivity.value;
       currentActivities[newIndex].label = newActivity.label;
 
-      return this.setState({activities: currentActivities});
+      return this.setColors(currentActivities);
     }
 
     // Add new activity to activities array
@@ -79,7 +81,7 @@ class App extends Component {
       currentActivities.splice(newIndex, 1);
     }
 
-    return this.setState({activities: currentActivities});
+    return this.setColors(currentActivities);
   }
 
   // Update activity label in activities array
@@ -107,13 +109,13 @@ class App extends Component {
     if (errorMessage) {
       currentActivities[activityIndex].errorMessage = errorMessage;
 
-      return this.setState({activities: currentActivities});
+      return this.setColors(currentActivities);
     }
 
     // Update activity label in activities array
     currentActivities[activityIndex].label = newLabel;
 
-    return this.setState({activities: currentActivities});
+    return this.setColors(currentActivities);
   }
 
   // Update activity hours value in activities array
@@ -136,7 +138,7 @@ class App extends Component {
     if (errorMessage) {
       currentActivities[activityIndex].errorMessage = errorMessage;
 
-      return this.setState({activities: currentActivities});
+      return this.setColors(currentActivities);
     }
 
     // If new hours value is null or 0, remove activity from activities array
@@ -173,7 +175,7 @@ class App extends Component {
       currentActivities.splice(newIndex, 1);
     }
 
-    return this.setState({activities: currentActivities});
+    return this.setColors(currentActivities);
   }
 
   // Remove activity from activities array
@@ -206,7 +208,7 @@ class App extends Component {
       currentActivities.push({id: '?', value: '', label: ''});
     }
 
-    return this.setState({activities: currentActivities});
+    return this.setColors(currentActivities);
   }
 
   // Replace activities array with passed array
@@ -217,7 +219,35 @@ class App extends Component {
     activities array */
     currentActivities.splice(0, currentActivities.length, ...activities);
 
-    return this.setState({activities: currentActivities});
+    return this.setColors(currentActivities);
+  }
+
+  // Set color for each activity for display in chart and calculator
+  setColors(activities) {
+    // Set base color to make a color palette from
+    const base_color = Please.make_color({
+      saturation: 1,
+      value: 1,
+      golden: true,
+      format: 'hsv'
+    });
+
+    // Create color palette
+    const colors = Please.make_scheme(base_color[0],
+      {scheme_type: 'analogous'}, activities.length - 1);
+
+    // Add color to each activity in activities array, excluding placeholders
+    activities = activities.map(function (activity) {
+      if (!['?', 0].includes(activity.id)) {
+        activity.color = colors[activity.id - 1];
+
+        return activity;
+      }
+
+      return activity;
+    });
+
+    return this.setState({activities: activities});
   }
 
   render() {
