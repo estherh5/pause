@@ -1,7 +1,6 @@
 table {
-  width: 250px;
   border-collapse: collapse;
-  margin-bottom: 40px;
+  margin-bottom: 10px;
   text-align: center;
 }
 
@@ -16,12 +15,20 @@ td {
   font-size: 14px;
 }
 
+.activity {
+  width: 164px;
+}
+
 .hours {
   width: 70px;
 }
 
-#empty-hours {
-  margin-right: 15px;
+.hours input {
+  width: 54px;
+}
+
+td button {
+  width: 21px;
 }
 
 td button:hover {

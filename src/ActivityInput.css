@@ -11,6 +11,19 @@ input:focus {
   outline-width: 2px;
 }
 
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input:focus::-webkit-outer-spin-button {
+  -webkit-appearance: outer-spin-button;
+}
+
+input:focus::-webkit-inner-spin-button {
+  -webkit-appearance: inner-spin-button;
+}
+
 .new {
   border-color: #dcdcdc;
   border-style: solid;

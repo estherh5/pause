@@ -198,12 +198,12 @@ class Table extends Component {
             <tr>
               {activity.value === 0 ? (null) : (
                 activity.id === 0 ? (
-                  <td>
+                  <td className="activity">
                     <div>{activity.label}</div>
                   </td>
                 ) : (
                   activity.id === '?' ? (
-                    <td>
+                    <td className="activity">
                       <ActivityInput
                         id={activity.id}
                         className="new"
@@ -213,7 +213,7 @@ class Table extends Component {
                         onBlur={this.editLabel} />
                     </td>
                   ) : (
-                    <td>
+                    <td className="activity">
                       <ActivityInput
                         id={activity.id}
                         type="text"
