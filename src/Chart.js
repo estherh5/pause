@@ -55,8 +55,8 @@ class Chart extends Component {
       borderWidth = 0.9;
     }
 
-    /* Set chart options to hide legend, resize chart, and set divider width
-    between chart slices */
+    /* Set chart options to hide legend, resize chart, set divider width
+    between chart slices, and display percentage in tooltip */
     const chartOptions = {
       legend: {display: false},
       responsive: true,
@@ -64,6 +64,21 @@ class Chart extends Component {
       elements: {
         arc: {
           borderWidth: borderWidth
+        }
+      },
+      tooltips: {
+        callbacks: {
+          label: function(tooltipItem, data) {
+            const chartDataset = data.datasets[tooltipItem.datasetIndex];
+
+            const label = labels[tooltipItem.index];
+
+            const currentValue = chartDataset.data[tooltipItem.index];
+
+            const percentage = Math.round((currentValue/24) * 100);
+
+            return ' ' + label + ': ' + percentage + "%";
+          }
         }
       }
     };
