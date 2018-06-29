@@ -95,7 +95,9 @@ class Header extends Component {
       <div id="header">
         <div id="header-container">
           <div id="site-menu-icon-container">
-            <img id="site-menu-icon" title="Site menu" alt="site-menu"
+            <img id="site-menu-icon"
+              title="Toggle site menu"
+              alt="Site menu icon"
               src="https://crystalprism.io/images/site-menu-icon-shadow.svg"
               onMouseDown={this.toggleSiteMenu} />
           </div>
@@ -110,13 +112,14 @@ class Header extends Component {
                     <td className="site-menu-image-cell"
                       data-link={project.link}>
                         <img className="site-menu-image"
+                          alt={project.title + ' icon'}
+                          title={project.title}
                           data-link={project.link}
-                          alt={project.title + ' link'}
                           src={project.favicon} />
                     </td>
                     <td className="site-menu-text-cell"
                       data-link={project.link}>
-                        <div className="site-menu-text"
+                        <div className="site-menu-text" title={project.title}
                           data-link={project.link}>{project.title}</div>
                     </td>
                 </tr>

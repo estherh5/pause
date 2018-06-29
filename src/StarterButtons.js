@@ -88,6 +88,7 @@ class StarterButtons extends Component {
         <button
           key={type.toLowerCase()}
           id={type.toLowerCase()}
+          title={type + ' activities'}
           data-type={type.toLowerCase()}
           onClick={this.toggleActivities}>{type}</button>
       )}

@@ -7,7 +7,8 @@ import registerServiceWorker from './registerServiceWorker';
 ReactDOM.render(<App />, document.getElementById('root'));
 ReactDOM.render(
     <span>
-      © 2018 <a href="https://crystalprism.io">Crystal Prism</a>
+      © 2018 <a href="https://crystalprism.io" title="Crystal Prism">
+        Crystal Prism</a>
     </span>,
     document.getElementById('footer'));
 

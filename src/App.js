@@ -150,11 +150,11 @@ class App extends Component {
         <Header />
         <div id="app-container">
           <h1 id="title">
-            <a href=".">Pause</a>
+            <a href="." title="Pause">Pause</a>
           </h1>
           <h2 id="subtitle">
             How do you want to spend your&nbsp;
-              <select onChange={this.setTimeUnit}>
+              <select title="Toggle time period" onChange={this.setTimeUnit}>
                 <option>day</option>
                 <option>week</option>
                 <option>month</option>

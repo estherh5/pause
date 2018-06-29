@@ -57,6 +57,7 @@ class ActivityInput extends Component {
         data-id={this.props.dataId}
         type={this.props.type}
         placeholder={this.props.placeholder}
+        title={this.props.placeholder}
         min={this.props.min}
         max={this.props.max}
         step={this.props.step}

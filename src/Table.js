@@ -359,11 +359,16 @@ class Table extends Component {
                 ) : (
                   activity.id === '?' ? (
                     <td>
-                      <button onClick={this.createActivity}>Add</button>
+                      <button
+                        title="Add activity"
+                        onClick={this.createActivity}>Add</button>
                     </td>
                   ) : (
                     <td>
-                      <button className="delete" onClick={this.deleteActivity}
+                      <button
+                        className="delete"
+                        title="Remove activity"
+                        onClick={this.deleteActivity}
                         data-id={activity.id}>x</button>
                     </td>
                   )

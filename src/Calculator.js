@@ -134,6 +134,8 @@ class Calculator extends Component {
           <input
             id="age-start"
             type="number"
+            placeholder="age"
+            title="Enter your age"
             min="0"
             step="1"
             onBlur={this.setAge} />&nbsp;
@@ -142,6 +144,8 @@ class Calculator extends Component {
           <input
             id="age-end"
             type="number"
+            placeholder="age"
+            title="Enter the age you would like to live to"
             min={this.state.ageEnd}
             step="1"
             onBlur={this.setDifference} />, then I will spend...
