@@ -16,10 +16,10 @@
   box-shadow: none !important;
 }
 
-#Clear {
+#clear {
   background-color: #ff0000 !important;
 }
 
-#Clear:hover {
+#clear:hover {
   background-color: #da0101 !important;
 }

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import cloneDeep from 'lodash/cloneDeep';
 import './Calculator.css';
 
 // Table that generates calculations based on user's age and activities
@@ -73,10 +74,58 @@ class Calculator extends Component {
     const monthDays = new Date((now).getFullYear(), now.getMonth() - 1, 0)
       .getDate();
 
-    /* Filter out activities that have not been added yet and remaining hours
-    activity placeholder */
-    const activities = this.props.activities
-      .filter(activity => !['?', 0].includes(activity.id));
+    let currentActivities = cloneDeep(this.props.activities);
+
+    // Create activities array for calculations
+    let calculatedActivities = [];
+
+    let newId = 0;
+
+    /* Create weight variable that represents how many days' worth of data a
+    labels/value pair represents in the calculatedActivities array */
+    let weight = 1;
+
+    /* Iterate through all components' activities in parent state to add unique
+    activities to calculatedActivities array */
+    for (const i in currentActivities) {
+      /* Filter out activities that have not been added yet and remaining hours
+      activity placeholder */
+      currentActivities[i] = currentActivities[i].filter(activity => !['?', 0]
+        .includes(activity.id));
+
+      let labels = currentActivities[i].map(activity => activity.label);
+      let hours = currentActivities[i].map(activity => activity.value);
+      let colors = currentActivities[i].map(activity => activity.color);
+
+      for (const [index, item] of labels.entries()) {
+        // Check if activity label already exists in calculatedActivities array
+        let activityExists = calculatedActivities.some(function(activity) {
+          return activity.label.toLowerCase() === item.toLowerCase();
+        });
+
+        // If label does not exist, add activity to array
+        if (!activityExists) {
+          calculatedActivities.push({id: newId, label: item,
+            value: hours[index], color: colors[index], weight: weight});
+
+          // Increment newId for next activity that will be added to array
+          newId++;
+        }
+
+        // If label already exists, increment its hours and weight values
+        else {
+          // Get label's index in calculatedActivities array
+          let activityIndex = calculatedActivities.findIndex(activity =>
+            activity.label.toLowerCase() === item.toLowerCase());
+
+          // Add hours to activity
+          calculatedActivities[activityIndex].value += hours[index];
+
+          // Increment weight to represent another days' worth of data
+          calculatedActivities[activityIndex].weight++;
+        }
+      }
+    }
 
     return (
       <div id="calculator-container">
@@ -101,7 +150,7 @@ class Calculator extends Component {
           <div className="error">{this.state.errorMessage}</div>
         ): (null)}
         {!this.state.difference || this.state.errorMessage ||
-          activities.length < 1 ? (null) : (
+          calculatedActivities.length < 1 ? (null) : (
             <table id="calculator">
               <thead>
                 <tr>
@@ -111,25 +160,26 @@ class Calculator extends Component {
                   <th>Weekly</th>
                 </tr>
               </thead>
-              {activities.map((activity) =>
+              {calculatedActivities.map(activity =>
                 <tbody key={stringTime + activity.id}>
                   <tr>
                     <td>
                       <div>
                         <b>
-                          {activity.value * this.state.difference * 365}
+                          {activity.value / activity.weight *
+                            this.state.difference * 365}
                         </b> hours on <b style={{color: activity.color}}>
                           {activity.label}</b>
                       </div>
                     </td>
                     <td>
-                      <div>{activity.value * 365}</div>
+                      <div>{activity.value / activity.weight * 365}</div>
                     </td>
                     <td>
-                      <div>{activity.value * monthDays}</div>
+                      <div>{activity.value / activity.weight * monthDays}</div>
                     </td>
                     <td>
-                      <div>{activity.value * 7}</div>
+                      <div>{activity.value / activity.weight * 7}</div>
                     </td>
                   </tr>
                 </tbody>

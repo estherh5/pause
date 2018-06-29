@@ -19,6 +19,10 @@ td {
   width: 164px;
 }
 
+.activity input {
+  width: 154px;
+}
+
 .hours {
   width: 70px;
 }
@@ -54,10 +58,33 @@ tr:hover td .delete {
   font-size: 10px;
 }
 
-
 @media only screen and (min-width: 630px) {
-  table {
+  table.day {
     margin-bottom: 0px;
     margin-right: 40px;
+  }
+
+  table.week, table.month {
+    margin-bottom: 10px;
+  }
+
+  table.week th, table.month th, table.week td, table.month td {
+    font-size: 11px;
+  }
+
+  table.week .activity, table.month .activity {
+    width: 100px;
+  }
+
+  table.week .activity input, table.month .activity input {
+    width: 95px;
+  }
+
+  table.week .hours, table.month .hours {
+    width: 53px;
+  }
+
+  table.week .hours input, table.month .hours input {
+    width: 45px;
   }
 }

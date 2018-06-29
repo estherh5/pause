@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import cloneDeep from 'lodash/cloneDeep';
 import './Chart.css';
 import { Pie, Bar, Radar, Doughnut, defaults } from 'react-chartjs-2';
 
@@ -15,6 +16,9 @@ class Chart extends Component {
       chartType: 'pie'
     }
 
+    // Component identifier from App parent
+    this.id = this.props.id;
+
     // Set available chart types
     this.chartTypes = [
       'pie', 'bar', 'radar', 'doughnut'
@@ -23,9 +27,16 @@ class Chart extends Component {
     this.setChartType = this.setChartType.bind(this);
   }
 
-  // Prevent rendering of component if there is an error in the activities data
+  /* Set pie to selected chart type when time unit changes and prevent
+  rendering of component if there is an error in the activities data */
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextState.chartType === this.state.chartType) {
+    if (nextProps.timeUnit !== this.props.timeUnit) {
+      document.getElementById('pie' + this.props.id).click();
+
+      return true;
+    }
+
+    else if (nextState.chartType === this.state.chartType) {
       for (const activity of nextProps.activities) {
         if (activity.errorMessage) {
           return false;
@@ -40,17 +51,17 @@ class Chart extends Component {
   setChartType(e) {
     const type = e.target.dataset.type;
 
-    // Do nothing if type is not in available list of chart types
+    // Do nothing if type is not in available array of chart types
     if (!this.chartTypes.includes(type)) {
       return;
     }
 
     // Set currently selected button to unselected
-    document.getElementsByClassName('selected')[0].classList
-      .remove('selected');
+    document.getElementById('buttons' + this.id)
+      .getElementsByClassName('selected')[0].classList.remove('selected');
 
     // Set clicked button to selected
-    document.getElementById(type).classList.add('selected');
+    document.getElementById(type + this.id).classList.add('selected');
 
     return this.setState({chartType: type});
   }
@@ -59,20 +70,12 @@ class Chart extends Component {
     /* Filter out activities that have not been added yet or have no hours
     value (i.e., the remaining hours activity placeholder if no hours are left
     in the day) */
-    const activities = this.props.activities
+    const activities = cloneDeep(this.props.activities)
       .filter(activity => activity.id !== '?' && activity.value !== 0);
 
-    let labels = activities.map(function (obj) {
-      return obj.label;
-    });
-
-    let hours = activities.map(function (obj) {
-      return obj.value;
-    });
-
-    let colors = activities.map(function (obj) {
-      return obj.color;
-    });
+    let labels = activities.map(obj => obj.label);
+    let hours = activities.map(obj => obj.value);
+    let colors = activities.map(obj => obj.color);
 
     // Set data for all chart types
     let chartData = {
@@ -185,40 +188,41 @@ class Chart extends Component {
     }
 
     return (
-      <div id="chart-container">
-        <div id="chart-button-container">
-          <button id="pie"
-            className="chart-button selected"
-            onClick={this.setChartType}
-            data-type="pie"
-            title="Pie chart">
-              <i className="fas fa-chart-pie" data-type="pie"></i>
-          </button>
-          <button id="bar"
-            className="chart-button"
-            onClick={this.setChartType}
-            data-type="bar"
-            title="Bar chart">
-              <i className="fas fa-chart-bar" data-type="bar"></i>
-          </button>
-          <button id="radar"
-            className="chart-button"
-            onClick={this.setChartType}
-            data-type="radar"
-            title="Radar chart">
-              <i className="material-icons"
-                data-type="radar">track_changes</i>
-          </button>
-          <button id="doughnut"
-            className="chart-button"
-            onClick={this.setChartType}
-            data-type="doughnut"
-            title="Doughnut chart">
-              <i className="material-icons"
-                data-type="doughnut">donut_small</i>
-          </button>
+      <div className={'chart-container ' + this.props.timeUnit}>
+        <div id={'buttons' + this.props.id}
+          className={'chart-button-container ' + this.props.timeUnit}>
+            <button id={'pie' + this.props.id}
+              className={'pie chart-button selected ' + this.props.timeUnit}
+              onClick={this.setChartType}
+              data-type="pie"
+              title="Pie chart">
+                <i className="fas fa-chart-pie" data-type="pie"></i>
+            </button>
+            <button id={'bar' + this.props.id}
+              className={'bar chart-button ' + this.props.timeUnit}
+              onClick={this.setChartType}
+              data-type="bar"
+              title="Bar chart">
+                <i className="fas fa-chart-bar" data-type="bar"></i>
+            </button>
+            <button id={'radar' + this.props.id}
+              className={'radar chart-button ' + this.props.timeUnit}
+              onClick={this.setChartType}
+              data-type="radar"
+              title="Radar chart">
+                <i className="material-icons"
+                  data-type="radar">track_changes</i>
+            </button>
+            <button id={'doughnut' + this.props.id}
+              className={'doughnut chart-button ' + this.props.timeUnit}
+              onClick={this.setChartType}
+              data-type="doughnut"
+              title="Doughnut chart">
+                <i className="material-icons"
+                  data-type="doughnut">donut_small</i>
+            </button>
         </div>
-        <div id="chart-visual-container">
+        <div className={'chart-visual-container ' + this.props.timeUnit}>
           {this.state.chartType === 'bar' ? (
             <Bar data={chartData} options={chartOptions} />
           ) : (

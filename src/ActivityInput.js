@@ -39,7 +39,7 @@ class ActivityInput extends Component {
       <input
         id={this.props.type + this.props.id}
         className={this.props.className}
-        data-id={this.props.id}
+        data-id={this.props.dataId}
         type={this.props.type}
         placeholder={this.props.placeholder}
         min={this.props.min}

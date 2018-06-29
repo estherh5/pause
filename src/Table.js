@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
+import cloneDeep from 'lodash/cloneDeep';
 import './Table.css';
-import ActivityInput from './ActivityInput.js'
+import ActivityInput from './ActivityInput.js';
 
 // Table that contains inputs for each activity
 class Table extends Component {
   constructor(props) {
     super(props);
+
+    // Component identifier from App parent
+    this.id = this.props.id;
 
     this.createActivity = this.createActivity.bind(this);
     this.editLabel = this.editLabel.bind(this);
@@ -13,16 +17,48 @@ class Table extends Component {
     this.deleteActivity = this.deleteActivity.bind(this);
   }
 
+  /* Prevent updating of component if there are no changes to its activities
+  array */
+  shouldComponentUpdate(nextProps, nextState) {
+    let newActivities = nextProps.activities;
+
+    let prevActivities = this.props.activities;
+
+    if (newActivities.length !== prevActivities.length) {
+      return true;
+    }
+
+    /* Update component if there is a change in the activities' values, labels,
+    or error message */
+    for (const [index, activity] of newActivities.entries()) {
+      let newItem = newActivities[index];
+      let prevItem = prevActivities[index];
+
+      if (nextProps.timeUnit !== this.props.timeUnit ||
+        newItem.value !== prevItem.value ||
+        newItem.label !== prevItem.label || (newItem.errorMessage &&
+        newItem.errorMessage !== prevItem.errorMessage) ||
+        (prevItem.errorMessage && newItem.errorMessage !==
+        prevItem.errorMessage)) {
+          return true;
+        }
+    }
+
+    return false;
+  }
+
   // Validate new activity input values when Add button is clicked
-  createActivity(e) {
-    let parentState = this.props;
+  createActivity() {
+    let currentActivities = cloneDeep(this.props.activities);
 
     // Get input values for new activity
-    const newLabel = document.getElementById('text?').value.trim();
+    const newLabel = document.getElementById('text' + this.id + '?').value
+      .trim();
     let newHours;
 
-    if (document.getElementById('number?').value) {
-      newHours = parseFloat(document.getElementById('number?').value, 10);
+    if (document.getElementById('number' + this.id + '?').value) {
+      newHours = parseFloat(document.getElementById('number' + this.id + '?')
+        .value, 10);
     } else {
       newHours = null;
     }
@@ -35,8 +71,8 @@ class Table extends Component {
       return this.props.onAddActivity(newActivity, errorMessage);
     }
 
-    // Check if activity label already exists in activities list
-    const activityExists = parentState.activities.some(function(activity) {
+    // Check if activity label already exists in activities array
+    const activityExists = currentActivities.some(function(activity) {
       if (activity.id !== '?') {
         return activity.label.toLowerCase() === newLabel.toLowerCase();
       }
@@ -71,7 +107,7 @@ class Table extends Component {
     value, excluding placeholders */
     let totalHours = 0;
 
-    for (const activity of parentState.activities) {
+    for (const activity of currentActivities) {
       if (!['?', 0].includes(activity.id)) {
         totalHours += activity.value;
       }
@@ -86,9 +122,9 @@ class Table extends Component {
     }
 
     // Set new activity id to next numerical value in activities array
-    const newId = parentState.activities
+    const newId = currentActivities
       .reduce((max, obj) => obj.id > max ? obj.id : max,
-      parentState.activities[0].id) + 1;
+      currentActivities[0].id) + 1;
 
     const newActivity = {id: newId, value: newHours, label: newLabel};
 
@@ -97,22 +133,22 @@ class Table extends Component {
 
   // Validate label for existing activity when user edits it
   editLabel(activityId, newLabel) {
-    let parentState = this.props;
+    let currentActivities = cloneDeep(this.props.activities);
 
     // Get index of edited activity in activities array
-    const activityIndex = parentState.activities
-      .findIndex((obj => obj.id === activityId));
+    const activityIndex = currentActivities
+      .findIndex(obj => obj.id === activityId);
 
     // Get previous label for activity
-    const oldLabel = parentState.activities[activityIndex].label;
+    const oldLabel = currentActivities[activityIndex].label;
 
     // Do nothing if new labels is same as old label
     if (newLabel === oldLabel) {
       return;
     }
 
-    // Check if activity label already exists in activities list
-    const activityExists = parentState.activities.some(function(activity) {
+    // Check if activity label already exists in activities array
+    const activityExists = currentActivities.some(function(activity) {
       if (activity.id !== '?') {
         return activity.label.toLowerCase() === newLabel.toLowerCase();
       }
@@ -130,7 +166,7 @@ class Table extends Component {
 
   // Validate hours value for existing activity when user edits it
   editHours(activityId, newHours) {
-    let parentState = this.props;
+    let currentActivities = cloneDeep(this.props.activities);
 
     // Display error if hours is negative number
     if (newHours < 0) {
@@ -140,11 +176,11 @@ class Table extends Component {
     }
 
     // Get index of edited activity in activities array
-    const activityIndex = parentState.activities
-      .findIndex((obj => obj.id === activityId));
+    const activityIndex = currentActivities
+      .findIndex(obj => obj.id === activityId);
 
     // Get previous hours value for activity
-    const oldHours = parentState.activities[activityIndex].value;
+    const oldHours = currentActivities[activityIndex].value;
 
     // Do nothing if new hours value is same as old hours value
     if (newHours === oldHours) {
@@ -155,7 +191,7 @@ class Table extends Component {
     value, excluding placeholders */
     let totalHours = 0;
 
-    for (const activity of parentState.activities) {
+    for (const activity of currentActivities) {
       if (!['?', 0].includes(activity.id)) {
         totalHours += activity.value;
       }
@@ -181,19 +217,19 @@ class Table extends Component {
 
   render() {
     /* Get current ISO string time to use in key for each table row to force
-    re-rendering of values when activities list gets updated */
-    const date = new Date();
-    const stringTime = date.toISOString();
+    re-rendering of values when activities array gets updated */
+    const now = new Date();
+    const stringTime = now.toISOString();
 
     return (
-      <table>
+      <table className={this.props.timeUnit}>
         <thead>
           <tr>
             <th>Activity</th>
             <th>Hours</th>
           </tr>
         </thead>
-        {this.props.activities.map((activity) =>
+        {this.props.activities.map(activity =>
           <tbody key={stringTime + activity.id}>
             <tr>
               {activity.value === 0 ? (null) : (
@@ -205,8 +241,9 @@ class Table extends Component {
                   activity.id === '?' ? (
                     <td className="activity">
                       <ActivityInput
-                        id={activity.id}
-                        className="new"
+                        id={this.props.id + activity.id}
+                        dataId={activity.id}
+                        className={'new ' + this.props.timeUnit}
                         type="text"
                         placeholder="activity"
                         value={activity.label}
@@ -215,7 +252,9 @@ class Table extends Component {
                   ) : (
                     <td className="activity">
                       <ActivityInput
-                        id={activity.id}
+                        id={this.props.id + activity.id}
+                        dataId={activity.id}
+                        className={this.props.timeUnit}
                         type="text"
                         placeholder="activity"
                         value={activity.label}
@@ -233,8 +272,9 @@ class Table extends Component {
                   activity.id === '?' ? (
                     <td className="hours">
                       <ActivityInput
-                        id={activity.id}
-                        className="new"
+                        id={this.props.id + activity.id}
+                        dataId={activity.id}
+                        className={'new ' + this.props.timeUnit}
                         type="number"
                         placeholder="hours"
                         min="0.25"
@@ -246,7 +286,9 @@ class Table extends Component {
                   ) : (
                     <td className="hours">
                       <ActivityInput
-                        id={activity.id}
+                        id={this.props.id + activity.id}
+                        dataId={activity.id}
+                        className={this.props.timeUnit}
                         type="number"
                         placeholder="hours"
                         min="0.25"

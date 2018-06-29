@@ -1,4 +1,4 @@
-#app-container, #data-container, #button-container {
+#app-container, #button-container {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -26,15 +26,61 @@
 }
 
 #subtitle {
+  margin-bottom: 25px;
   font-weight: normal;
 }
 
+select {
+  padding: 3px;
+  border-color: #dcdcdc;
+  border-style: solid;
+  border-width: 1px;
+  background: none;
+  font-family: 'Raleway', sans-serif;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+}
+
+#day-data-container {
+  padding: 15px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
 #button-container {
-  margin-top: 60px;
+  margin-top: 45px;
 }
 
 @media only screen and (min-width: 630px) {
-  #data-container, #button-container {
+  #subtitle {
+    margin-bottom: 45px;
+  }
+
+  #day-data-container {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+  }
+
+  #button-container {
+    margin-top: 60px;
     -webkit-box-orient: horizontal;
     -webkit-box-direction: normal;
     -webkit-flex-direction: row;
@@ -44,9 +90,5 @@
     -webkit-align-items: flex-start;
     -ms-flex-align: start;
     align-items: flex-start;
-  }
-
-  #data-container {
-    margin-top: 30px;
   }
 }

@@ -22,7 +22,7 @@ class StarterButtons extends Component {
   button is clicked */
   toggleActivities(e) {
     // Get activity starter type from button
-    const type = e.target.dataset.type.toLowerCase();
+    const type = e.target.dataset.type;
 
     let activities;
 
@@ -84,11 +84,11 @@ class StarterButtons extends Component {
   render() {
     return (
       <div>
-      {this.types.map((type) =>
+      {this.types.map(type =>
         <button
-          key={type}
-          id={type}
-          data-type={type}
+          key={type.toLowerCase()}
+          id={type.toLowerCase()}
+          data-type={type.toLowerCase()}
           onClick={this.toggleActivities}>{type}</button>
       )}
       </div>

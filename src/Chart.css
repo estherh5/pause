@@ -1,8 +1,8 @@
-#chart-container {
+.chart-container {
   margin-top: 10px;
 }
 
-#chart-button-container {
+.chart-button-container {
   padding: 5px;
   margin-bottom: 8px;
   display: -webkit-box;
@@ -20,14 +20,6 @@
   text-align: center;
 }
 
-#pie {
-  margin-right: 6px;
-}
-
-#radar, #bar {
-  margin-right: 4px;
-}
-
 .chart-button {
   height: 20px;
   width: 20px;
@@ -40,36 +32,79 @@
   color: #989696;
 }
 
+.pie {
+  margin-right: 6px;
+}
+
+.radar, .bar {
+  margin-right: 4px;
+}
+
 .selected {
   outline: none;
   color: #989696 !important;
   text-shadow: 0.3px 0.3px 0px #444444;
 }
 
-#pie i {
-  font-size: 18px;
-}
-
 .chart-button i {
   font-size: 20px;
 }
 
-#chart-visual-container {
+.pie i {
+  font-size: 18px;
+}
+
+.chart-visual-container {
   position: relative;
   height: 300px;
   width: 300px;
 }
 
+.chart-visual-container.week, .chart-visual-container.month {
+  height: 250px;
+  width: 250px;
+}
+
 @media only screen and (min-width: 630px) {
-  #chart-container {
+  .chart-button-container.week, .chart-button-container.month {
+    margin-bottom: 0px;
+  }
+
+  .chart-container {
     margin-top: 0px;
+  }
+
+  .pie.week, .pie.month {
+    margin-right: 4px;
+  }
+
+  .radar.week, .radar.month, .bar.week, .bar.month {
+    margin-right: 2px;
   }
 
   .chart-button {
     visibility: hidden;
   }
 
-  #chart-container:hover .chart-button {
+  .chart-button.week, .chart-button.month {
+    height: 18px;
+    width: 18px;
+  }
+
+  .chart-container:hover .chart-button {
     visibility: visible !important;
+  }
+
+  .chart-button.week i, .chart-button.month i {
+    font-size: 18px;
+  }
+
+  .pie.week i, .pie.month i {
+    font-size: 16px;
+  }
+
+  .chart-visual-container.week, .chart-visual-container.month {
+    height: 200px;
+    width: 200px;
   }
 }
