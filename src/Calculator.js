@@ -166,20 +166,30 @@ class Calculator extends Component {
                     <td>
                       <div>
                         <b>
-                          {activity.value / activity.weight *
-                            this.state.difference * 365}
+                          {Math.round(activity.value / activity.weight *
+                            this.state.difference * 365).toLocaleString()}
                         </b> hours on <b style={{color: activity.color}}>
                           {activity.label}</b>
                       </div>
                     </td>
                     <td>
-                      <div>{activity.value / activity.weight * 365}</div>
+                      <div>
+                        {Math.round(activity.value / activity.weight * 365)
+                          .toLocaleString()}
+                      </div>
                     </td>
                     <td>
-                      <div>{activity.value / activity.weight * monthDays}</div>
+                      <div>
+                        {Math
+                          .round(activity.value / activity.weight * monthDays)
+                          .toLocaleString()}
+                      </div>
                     </td>
                     <td>
-                      <div>{activity.value / activity.weight * 7}</div>
+                      <div>
+                        {Math.round(activity.value / activity.weight * 7)
+                          .toLocaleString()}
+                      </div>
                     </td>
                   </tr>
                 </tbody>
