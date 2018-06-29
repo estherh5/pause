@@ -35,6 +35,11 @@ class App extends Component {
     this.replaceActivities = this.replaceActivities.bind(this);
   }
 
+  // Focus on new input field after component gets mounted
+  componentDidMount() {
+    return document.getElementById('text0?').focus();
+  }
+
   // Set time unit to enter data for based on user's selection
   setTimeUnit(e) {
     const timeUnit = e.target.options[e.target.selectedIndex].text;

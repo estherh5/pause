@@ -47,6 +47,31 @@ class Table extends Component {
     return false;
   }
 
+  // Focus on new input field if it is rendered in component
+  componentDidUpdate() {
+    let currentActivities = this.props.activities;
+
+    // Check if an hours error exists in activities array
+    const hoursError = currentActivities.some(function(activity) {
+      if (activity.errorMessage) {
+        return activity.errorMessage
+          .includes('How much time do you want to spend on') ||
+          activity.errorMessage === 'There aren\'t enough hours in the day!'
+          || activity.errorMessage === 'You can\'t get more time!';
+      }
+    })
+
+    if (hoursError) {
+      document.getElementById('number' + this.id + '?').focus();
+    }
+
+    else if (document.getElementById('text' + this.id + '?')) {
+      return document.getElementById('text' + this.id + '?').focus();
+    }
+
+    return;
+  }
+
   // Validate new activity input values when Add button is clicked
   createActivity() {
     let currentActivities = cloneDeep(this.props.activities);

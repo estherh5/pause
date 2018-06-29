@@ -27,6 +27,11 @@ class DayData extends Component {
     this.removeActivity = this.removeActivity.bind(this);
   }
 
+  // Focus on new input field after component gets mounted
+  componentDidMount() {
+    return document.getElementById('text0?').focus();
+  }
+
   // Add activity to activities array or display error message
   addActivity(newActivity, errorMessage) {
     let currentActivities = cloneDeep(this.props.activities);
