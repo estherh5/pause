@@ -126,8 +126,10 @@ class DayData extends Component {
     return this.props.onActivitiesUpdate(componentId, currentActivities);
   }
 
-  // Update activity hours value in activities array or display error message
-  updateHours(activityId, newHours, errorMessage) {
+  /* Update activity hours value in activities array and remove to-merge
+  activity if user wants to combine activity with another, or display error
+  message */
+  updateHours(activityId, newHours, errorMessage, combinedId) {
     let currentActivities = cloneDeep(this.props.activities);
 
     // Get component's id
@@ -163,11 +165,19 @@ class DayData extends Component {
     // Get index of new activity in activities array
     const newIndex = currentActivities.findIndex(obj => obj.id === '?');
 
-    // Get previous hours value for activity
-    const oldHours = currentActivities[activityIndex].value;
+    // Remove activity that is getting combined with current activity
+    if (combinedId) {
+      currentActivities.splice(combinedId, 1);
+    }
 
-    // Increment difference in updated activity's hours from remaining hours
-    currentActivities[emptyIndex].value += (oldHours - newHours);
+    // Remove updated hours from remaining hours for net-new hours values
+    else {
+      // Get previous hours value for activity
+      const oldHours = currentActivities[activityIndex].value;
+
+      // Increment difference in updated activity's hours from remaining hours
+      currentActivities[emptyIndex].value += (oldHours - newHours);
+    }
 
     // Update activity hours value in activities array
     currentActivities[activityIndex].value = newHours;

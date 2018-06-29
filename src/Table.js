@@ -97,21 +97,6 @@ class Table extends Component {
       return this.props.onAddActivity(newActivity, errorMessage);
     }
 
-    // Check if activity label already exists in activities array
-    const activityExists = currentActivities.some(function(activity) {
-      if (activity.id !== '?') {
-        return activity.label.toLowerCase() === newLabel.toLowerCase();
-      }
-    })
-
-    // Display error if activity label already exists
-    if (activityExists) {
-      const errorMessage = 'You already added ' + newLabel + '!';
-      const newActivity = {value: newHours, label: newLabel};
-
-      return this.props.onAddActivity(newActivity, errorMessage);
-    }
-
     // Display error if activity hours value is blank
     if (!newHours) {
       const errorMessage = 'How much time do you want to spend on ' +
@@ -119,6 +104,30 @@ class Table extends Component {
       const newActivity = {value: '', label: newLabel};
 
       return this.props.onAddActivity(newActivity, errorMessage);
+    }
+
+    // Check if activity label already exists in activities array
+    const activityExists = currentActivities.some(function(activity) {
+      if (activity.id !== '?') {
+        return activity.label.toLowerCase() === newLabel.toLowerCase();
+      }
+    })
+
+    // Update hours for activity if label already exists
+    if (activityExists) {
+      // Get index of existing activity in activities array
+      const existingIndex = currentActivities
+        .findIndex(obj => obj.label === newLabel);
+
+      // Get existing activity's id
+      const existingId = currentActivities[existingIndex].id;
+
+      // Get previous hours value for activity
+      const oldHours = currentActivities[existingIndex].value;
+
+      newHours += oldHours;
+
+      return this.editHours(existingId, newHours);
     }
 
     // Display error if hours is negative number
@@ -180,18 +189,32 @@ class Table extends Component {
       }
     })
 
-    // Display error if activity label already exists
+    // Update hours for activity if label already exists
     if (activityExists) {
-      const errorMessage = 'You already added ' + newLabel + '!';
+      // Get index of existing activity in activities array
+      const existingIndex = currentActivities
+        .findIndex(obj => obj.label === newLabel);
 
-      return this.props.onLabelEdit(activityId, newLabel, errorMessage);
+      // Get existing activity's id
+      const existingId = currentActivities[existingIndex].id;
+
+      // Get previous hours value for activity
+      const oldHours = currentActivities[existingIndex].value;
+
+      // Get updated hours value for activity
+      let newHours = currentActivities[activityIndex].value;
+
+      newHours += oldHours;
+
+      return this.editHours(existingId, newHours, activityId);
     }
 
     return this.props.onLabelEdit(activityId, newLabel);
   }
 
-  // Validate hours value for existing activity when user edits it
-  editHours(activityId, newHours) {
+  /* Validate hours value for existing activity when user edits it and remove
+  current activity if user wants to combine current activity with another */
+  editHours(activityId, newHours, combinedId) {
     let currentActivities = cloneDeep(this.props.activities);
 
     // Display error if hours is negative number
@@ -230,7 +253,7 @@ class Table extends Component {
       return this.props.onHoursEdit(activityId, newHours, errorMessage);
     }
 
-    return this.props.onHoursEdit(activityId, newHours);
+    return this.props.onHoursEdit(activityId, newHours, null, combinedId);
   }
 
   // Delete activity when "X" button is clicked
