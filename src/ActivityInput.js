@@ -7,9 +7,10 @@ class ActivityInput extends Component {
     super(props);
 
     this.getValue = this.getValue.bind(this);
+    this.submitValue = this.submitValue.bind(this);
   }
 
-  // Get input value when user focuses out of input
+  // Get input value when user focuses out of input or clicks Enter key
   getValue(e) {
     // Ignore value if activity hasn't been added yet
     if (e.target.dataset.id === '?') {
@@ -34,6 +35,20 @@ class ActivityInput extends Component {
     return this.props.onBlur(activityId, inputValue);
   }
 
+  /* Submit new input value or update current input value when user clicks
+  Enter key */
+  submitValue(e) {
+    if (e.target.dataset.id === '?' && e.key === 'Enter') {
+      return this.props.onEnter();
+    }
+
+    else if (e.key === 'Enter') {
+      return this.getValue(e);
+    }
+
+    return;
+  }
+
   render() {
     return (
       <input
@@ -46,7 +61,8 @@ class ActivityInput extends Component {
         max={this.props.max}
         step={this.props.step}
         defaultValue={this.props.value}
-        onBlur={this.getValue} />
+        onBlur={this.getValue}
+        onKeyPress={this.submitValue} />
     );
   }
 }

@@ -72,7 +72,8 @@ class Table extends Component {
     return;
   }
 
-  // Validate new activity input values when Add button is clicked
+  /* Validate new activity input values when Add button is clicked or user
+  presses Enter key */
   createActivity() {
     let currentActivities = cloneDeep(this.props.activities);
 
@@ -272,7 +273,8 @@ class Table extends Component {
                         type="text"
                         placeholder="activity"
                         value={activity.label}
-                        onBlur={this.editLabel} />
+                        onBlur={this.editLabel}
+                        onEnter={this.createActivity} />
                     </td>
                   ) : (
                     <td className="activity">
@@ -283,7 +285,8 @@ class Table extends Component {
                         type="text"
                         placeholder="activity"
                         value={activity.label}
-                        onBlur={this.editLabel} />
+                        onBlur={this.editLabel}
+                        onEnter={this.createActivity} />
                     </td>
                   )
                 )
@@ -306,7 +309,8 @@ class Table extends Component {
                         max="24"
                         step="0.25"
                         value={activity.value}
-                        onBlur={this.editHours} />
+                        onBlur={this.editHours}
+                        onEnter={this.createActivity} />
                     </td>
                   ) : (
                     <td className="hours">
@@ -320,7 +324,8 @@ class Table extends Component {
                         max="24"
                         step="0.25"
                         value={activity.value}
-                        onBlur={this.editHours} />
+                        onBlur={this.editHours}
+                        onEnter={this.createActivity} />
                     </td>
                   )
                 )
