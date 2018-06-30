@@ -262,7 +262,9 @@ class DayData extends Component {
           <Chart
             id={this.props.id}
             timeUnit={this.props.timeUnit}
-            activities={this.props.activities} />
+            activities={this.props.activities}
+            chartType={this.props.chartType}
+            onChartTypeChange={this.props.onChartTypeEdit} />
         </div>
       </div>
     );

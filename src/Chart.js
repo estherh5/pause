@@ -11,17 +11,12 @@ class Chart extends Component {
   constructor(props) {
     super(props);
 
-    // Set starting state to pie chart
-    this.state = {
-      chartType: 'pie'
-    }
-
     // Component identifier from App parent
     this.id = this.props.id;
 
     // Set available chart types
     this.chartTypes = [
-      'pie', 'bar', 'radar', 'doughnut'
+      'Pie', 'Bar', 'Radar', 'Doughnut'
     ]
 
     this.setChartType = this.setChartType.bind(this);
@@ -30,13 +25,7 @@ class Chart extends Component {
   /* Set pie to selected chart type when time unit changes and prevent
   rendering of component if there is an error in the activities data */
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.timeUnit !== this.props.timeUnit) {
-      document.getElementById('pie' + this.props.id).click();
-
-      return true;
-    }
-
-    else if (nextState.chartType === this.state.chartType) {
+    if (nextProps.chartType === this.props.chartType) {
       for (const activity of nextProps.activities) {
         if (activity.errorMessage) {
           return false;
@@ -51,19 +40,13 @@ class Chart extends Component {
   setChartType(e) {
     const type = e.target.dataset.type;
 
-    // Do nothing if type is not in available array of chart types
+    // Do nothing if type is not in array of chart types
     if (!this.chartTypes.includes(type)) {
       return;
     }
 
-    // Set currently selected button to unselected
-    document.getElementById('buttons' + this.id)
-      .getElementsByClassName('selected')[0].classList.remove('selected');
-
-    // Set clicked button to selected
-    document.getElementById(type + this.id).classList.add('selected');
-
-    return this.setState({chartType: type});
+    return this.props
+      .onChartTypeChange(parseInt(this.id, 10), type.toLowerCase());
   }
 
   render() {
@@ -126,7 +109,7 @@ class Chart extends Component {
     };
 
     // Set pie and doughnut chart options
-    if (['pie', 'doughnut'].includes(this.state.chartType)) {
+    if (['pie', 'doughnut'].includes(this.props.chartType)) {
       // Set divider width between slices for pie and doughnut charts
       let borderWidth;
 
@@ -148,7 +131,7 @@ class Chart extends Component {
     }
 
     // Set bar chart options
-    else if (this.state.chartType === 'bar') {
+    else if (this.props.chartType === 'bar') {
       // Get max hours value in activities array to set as max value for y-axis
       const maxValue = activities
         .reduce((max, activity) => activity.value > max ? activity.value : max,
@@ -170,7 +153,7 @@ class Chart extends Component {
     }
 
     // Set radar chart options
-    else if (this.state.chartType === 'radar') {
+    else if (this.props.chartType === 'radar') {
       // Set point background color for chart data instead of background color
       chartData.datasets = [{data: hours, pointBackgroundColor: colors}];
 
@@ -191,45 +174,37 @@ class Chart extends Component {
       <div className={'chart-container ' + this.props.timeUnit}>
         <div id={'buttons' + this.props.id}
           className={'chart-button-container ' + this.props.timeUnit}>
-            <button id={'pie' + this.props.id}
-              className={'pie chart-button selected ' + this.props.timeUnit}
+          {this.chartTypes.map(type =>
+            <button
+              key={type}
+              id={type.toLowerCase() + this.props.id}
+              className={type.toLowerCase() + ' chart-button ' +
+                this.props.timeUnit +
+                (type.toLowerCase() === this.props.chartType ?
+                  (' selected') : (null))}
               onClick={this.setChartType}
-              data-type="pie"
-              title="Pie chart">
-                <i className="fas fa-chart-pie" data-type="pie"></i>
+              data-type={type}
+              title={type + ' chart'}>
+                <i
+                  className={['Radar', 'Doughnut'].includes(type) ?
+                    ('material-icons') :
+                    ('fas fa-chart-' + type.toLowerCase())}
+                  data-type={type}>
+                    {type === 'Radar' ? ('track_changes') :
+                    (type === 'Doughnut' ? ('donut_small') :
+                    (null))}
+                  </i>
             </button>
-            <button id={'bar' + this.props.id}
-              className={'bar chart-button ' + this.props.timeUnit}
-              onClick={this.setChartType}
-              data-type="bar"
-              title="Bar chart">
-                <i className="fas fa-chart-bar" data-type="bar"></i>
-            </button>
-            <button id={'radar' + this.props.id}
-              className={'radar chart-button ' + this.props.timeUnit}
-              onClick={this.setChartType}
-              data-type="radar"
-              title="Radar chart">
-                <i className="material-icons"
-                  data-type="radar">track_changes</i>
-            </button>
-            <button id={'doughnut' + this.props.id}
-              className={'doughnut chart-button ' + this.props.timeUnit}
-              onClick={this.setChartType}
-              data-type="doughnut"
-              title="Doughnut chart">
-                <i className="material-icons"
-                  data-type="doughnut">donut_small</i>
-            </button>
+          )}
         </div>
         <div className={'chart-visual-container ' + this.props.timeUnit}>
-          {this.state.chartType === 'bar' ? (
+          {this.props.chartType === 'bar' ? (
             <Bar data={chartData} options={chartOptions} />
           ) : (
-            this.state.chartType === 'radar' ? (
+            this.props.chartType === 'radar' ? (
               <Radar data={chartData} options={chartOptions} />
             ) : (
-              this.state.chartType === 'doughnut' ? (
+              this.props.chartType === 'doughnut' ? (
                 <Doughnut data={chartData} options={chartOptions} />
               ) : (
                 <Pie data={chartData} options={chartOptions} />

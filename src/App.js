@@ -22,6 +22,9 @@ class App extends Component {
           {id: '?', value: '', label: ''}
         ]
       },
+      chartTypes: {
+        0: 'pie'
+      },
       timeUnit: 'day',
       month: null,
       year: null
@@ -41,6 +44,7 @@ class App extends Component {
     this.setTimeUnit = this.setTimeUnit.bind(this);
     this.toggleMonth = this.toggleMonth.bind(this);
     this.updateActivities = this.updateActivities.bind(this);
+    this.updateChartType = this.updateChartType.bind(this);
     this.replaceActivities = this.replaceActivities.bind(this);
   }
 
@@ -96,8 +100,14 @@ class App extends Component {
     componentRange
       .map(i => newActivities[i] = this.startingActivities);
 
+    /* Create starting chart type object for each DayData component that will
+    be rendered */
+    let newChartTypes = {};
+
+    componentRange.map(i => newChartTypes[i] = 'pie');
+
     return this.setState({timeUnit: timeUnit, month: month, year: year,
-      activities: newActivities});
+      activities: newActivities, chartTypes: newChartTypes});
   }
 
   toggleMonth(e) {
@@ -162,8 +172,14 @@ class App extends Component {
     componentRange
       .map(i => newActivities[i] = this.startingActivities);
 
+    /* Create starting chart type object for each DayData component that will
+    be rendered */
+    let newChartTypes = {};
+
+    componentRange.map(i => newChartTypes[i] = 'pie');
+
     return this.setState({month: newMonth, year: newYear,
-      activities: newActivities});
+      activities: newActivities, chartTypes: newChartTypes});
   }
 
   // Update specified component's activities in activities object
@@ -197,6 +213,16 @@ class App extends Component {
     currentActivities[componentId] = activities;
 
     return this.setState({activities: currentActivities});
+  }
+
+  // Update chart type in chart types array
+  updateChartType(componentId, newChartType) {
+    let currentChartTypes = cloneDeep(this.state.chartTypes);
+
+    // Update chart type in chart types array
+    currentChartTypes[componentId] = newChartType;
+
+    return this.setState({chartTypes: currentChartTypes});
   }
 
   // Replace all components' activities data with specified activities
@@ -277,14 +303,19 @@ class App extends Component {
               key={index + this.state.timeUnit + this.state.month}
               id={index}
               activities={this.state.activities[index]}
+              chartType={this.state.chartTypes[index]}
               timeUnit={this.state.timeUnit}
               month={this.state.timeUnit === 'month' ? (this.state.month) :
                 (null)}
-              onActivitiesUpdate={this.updateActivities} />
+              onActivitiesUpdate={this.updateActivities}
+              onChartTypeEdit={this.updateChartType} />
           )}
           </div>
           <div id="button-container">
             <StarterButtons onButtonClick={this.replaceActivities} />
+          </div>
+          <div id="save-container">
+            <button id="save" onClick={this.getUrl}>Save</button>
           </div>
           <Calculator activities={this.state.activities} />
         </div>
