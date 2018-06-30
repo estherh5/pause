@@ -16,11 +16,6 @@ class DayData extends Component {
     this.weeks = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday',
       'Friday', 'Saturday'];
 
-    /* List of months to convert from current month number if time unit is
-    'month' */
-    this.months = ['January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'];
-
     this.addActivity = this.addActivity.bind(this);
     this.updateLabel = this.updateLabel.bind(this);
     this.updateHours = this.updateHours.bind(this);
@@ -243,11 +238,6 @@ class DayData extends Component {
   }
 
   render() {
-    // Get current month number
-    const now = new Date();
-
-    const monthNumber = now.getMonth();
-
     return (
       <div className={'day-container ' + this.props.timeUnit}>
         {this.props.timeUnit === 'week' ? (
@@ -255,7 +245,7 @@ class DayData extends Component {
         ) : (
           this.props.timeUnit === 'month' ? (
             <h3 className="day-header">
-              {this.months[monthNumber] + ' ' +
+              {this.props.month + ' ' +
                 (parseInt(this.props.id, 10) + 1)}
             </h3>
           ) : (null)

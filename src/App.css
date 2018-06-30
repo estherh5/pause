@@ -42,6 +42,26 @@ select {
   cursor: pointer;
 }
 
+#month-toggle {
+  margin-bottom: 15px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+#month-toggle button {
+  margin-left: 30px;
+  margin-right: 30px;
+  font-size: 12px;
+}
+
+#month-toggle h2 {
+  width: 160px;
+  margin: 0px;
+  font-size: 20px;
+}
+
 #day-data-container {
   padding: 15px;
   display: -webkit-box;
