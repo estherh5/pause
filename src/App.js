@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
 import './App.css';
 import Please from './Please.js';
+import Modal from './Modal.js';
 import Header from './Header.js';
 import DayData from './DayData.js';
 import StarterButtons from './StarterButtons.js';
@@ -14,7 +16,7 @@ class App extends Component {
 
     /* Starting state that contains activity placeholders for remaining hours
     in the day (24) and empty new activity, as well as starting time unit,
-    month and year */
+    month and year, and modal status and message */
     this.state = {
       activities: {
         0: [
@@ -27,7 +29,11 @@ class App extends Component {
       },
       timeUnit: 'day',
       month: null,
-      year: null
+      year: null,
+      displayModal: false,
+      serverStatus: null,
+      modalMessage: null,
+      modalLink: null
     };
 
     // Set starting activities for new day
@@ -41,16 +47,46 @@ class App extends Component {
     this.months = ['January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'];
 
+    this.getData = this.getData.bind(this);
+    this.hideModal = this.hideModal.bind(this);
     this.setTimeUnit = this.setTimeUnit.bind(this);
     this.toggleMonth = this.toggleMonth.bind(this);
     this.updateActivities = this.updateActivities.bind(this);
     this.updateChartType = this.updateChartType.bind(this);
     this.replaceActivities = this.replaceActivities.bind(this);
+    this.postData = this.postData.bind(this);
   }
 
-  // Focus on new input field after component gets mounted
+  /* Load activities data from server if activities query param is present or
+  focus on new input field after component gets mounted */
   componentDidMount() {
+    // Get data id from URL activities query param
+    const dataId = window.location.search.split('activities=')[1];
+
+    if (dataId) {
+      return this.getData(dataId);
+    }
+
     return document.getElementById('text0?').focus();
+  }
+
+  // Load activities data from server for specified data id
+  getData(dataId) {
+    axios.get('https://pause-api.appspot.com/api/pause/activities/' + dataId)
+      .then(res => {
+        const data = res.data;
+
+        // Select time unit from dropdown menu
+        document.getElementById('select-time-unit').value = data['time_unit'];
+
+        return this.setState({activities: data['activities'],
+          chartTypes: data['chart_types'], timeUnit: data['time_unit'],
+          month: data['month'], year: data['year']});
+      })
+  }
+
+  hideModal() {
+    return this.setState({displayModal: false});
   }
 
   // Set time unit to enter data for based on user's selection
@@ -259,9 +295,38 @@ class App extends Component {
     return this.setState({activities: currentActivities});
   }
 
+  // Post activities data to server and get shareable URL for data
+  postData() {
+    const data = {
+      activities: this.state.activities,
+      chartTypes: this.state.chartTypes,
+      timeUnit: this.state.timeUnit,
+      month: this.state.month,
+      year: this.state.year
+    };
+
+    axios.post('https://pause-api.appspot.com/api/pause/activities', data)
+      .then(res => {
+        return this.setState({displayModal: true, serverStatus: 'success',
+          modalMessage: 'You can view your activities here:',
+          modalLink: window.location.origin + '/?activities=' + res.data});
+      })
+      .catch(error => {
+        return this.setState({displayModal: true, serverStatus: 'fail',
+          modalMessage: 'Your activities could not be saved. Please try ' +
+          'again soon.', modalLink: null});
+      })
+  }
+
   render() {
     return (
-      <div>
+      <div id="main-container">
+        <Modal
+          display={this.state.displayModal}
+          status={this.state.serverStatus}
+          message={this.state.modalMessage}
+          link={this.state.modalLink}
+          onCloseModal={this.hideModal} />
         <Header />
         <div id="app-container">
           <h1 id="title">
@@ -269,10 +334,12 @@ class App extends Component {
           </h1>
           <h2 id="subtitle">
             How do you want to spend your&nbsp;
-              <select title="Toggle time period" onChange={this.setTimeUnit}>
-                <option>day</option>
-                <option>week</option>
-                <option>month</option>
+              <select id="select-time-unit"
+                title="Toggle time period"
+                onChange={this.setTimeUnit}>
+                  <option>day</option>
+                  <option>week</option>
+                  <option>month</option>
               </select>
             ?
           </h2>
@@ -315,7 +382,7 @@ class App extends Component {
             <StarterButtons onButtonClick={this.replaceActivities} />
           </div>
           <div id="save-container">
-            <button id="save" onClick={this.getUrl}>Save</button>
+            <button id="save" onClick={this.postData}>Save</button>
           </div>
           <Calculator activities={this.state.activities} />
         </div>

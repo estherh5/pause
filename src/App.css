@@ -1,3 +1,14 @@
+#main-container {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
 #app-container, #button-container {
   display: -webkit-box;
   display: -webkit-flex;
@@ -81,6 +92,20 @@ select {
 
 #button-container {
   margin-top: 45px;
+}
+
+#save-container {
+  margin-top: 20px;
+}
+
+#save {
+  padding: 5px;
+  border-radius: 5px;
+  margin: 5px;
+  box-shadow: 1px 1px 1px #000000;
+  visibility: visible;
+  background-color: #0088ff;
+  font-size: 23px;
 }
 
 @media only screen and (min-width: 630px) {

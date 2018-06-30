@@ -22,9 +22,13 @@ class DayData extends Component {
     this.removeActivity = this.removeActivity.bind(this);
   }
 
-  // Focus on new input field after component gets mounted
+  // Focus on new input field if it exists after component gets mounted
   componentDidMount() {
-    return document.getElementById('text0?').focus();
+    if (document.getElementById('text0?')) {
+      return document.getElementById('text0?').focus();
+    }
+
+    return;
   }
 
   // Add activity to activities array or display error message
