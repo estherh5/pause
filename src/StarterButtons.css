@@ -1,15 +1,16 @@
 #button-container button {
-  padding: 5px;
+  padding: 7px;
   border-radius: 5px;
   margin: 5px;
-  box-shadow: 1px 1px 1px #000000;
+  box-shadow: 1px 1px 1px #b7b7b7;
   visibility: visible;
-  background-color: #0edc00;
-  font-size: 15px;
+  background-color: #0088ff;
+  font-size: 13px;
+  color: #ffffff;
 }
 
 #button-container button:hover {
-  background-color: #0db902;
+  background-color: #0078e0;
 }
 
 #button-container button:active {
@@ -17,9 +18,10 @@
 }
 
 #clear {
-  background-color: #ff0000 !important;
+  background-color: #fd5858 !important;
+  color: #000000 !important;
 }
 
 #clear:hover {
-  background-color: #da0101 !important;
+  background-color: #ea4f4f !important;
 }
