@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import './Table.css';
-import ActivityInput from './ActivityInput.js';
+import ActivityInput from './ActivityInput/ActivityInput.js';
 
 // Table that contains inputs for each activity
 class Table extends Component {

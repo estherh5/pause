@@ -3,11 +3,11 @@ import axios from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
 import './App.css';
 import Please from './Please.js';
-import Modal from './Modal.js';
-import Header from './Header.js';
-import DayData from './DayData.js';
-import StarterButtons from './StarterButtons.js';
-import Calculator from './Calculator.js';
+import Modal from './Modal/Modal.js';
+import Header from './Header/Header.js';
+import DayData from './DayData/DayData.js';
+import StarterButtons from './StarterButtons/StarterButtons.js';
+import Calculator from './Calculator/Calculator.js';
 
 // Main app that contains all components
 class App extends Component {

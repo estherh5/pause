@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import './DayData.css';
-import Table from './Table.js';
-import Chart from './Chart.js';
+import Table from './Table/Table.js';
+import Chart from './Chart/Chart.js';
 
 // Day component that contains table and chart for a single day's activities
 class DayData extends Component {
