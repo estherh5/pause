@@ -72,17 +72,18 @@ class App extends Component {
 
   // Load activities data from server for specified data id
   getData(dataId) {
-    axios.get('https://pause-api.appspot.com/api/pause/activities/' + dataId)
-      .then(res => {
-        const data = res.data;
+    axios.get('https://pause-app-api.herokuapp.com/api/pause/activities/' +
+      dataId)
+        .then(res => {
+          const data = res.data;
 
-        // Select time unit from dropdown menu
-        document.getElementById('select-time-unit').value = data['time_unit'];
+          // Select time unit from dropdown menu
+          document.getElementById('select-time-unit').value = data['time_unit'];
 
-        return this.setState({activities: data['activities'],
-          chartTypes: data['chart_types'], timeUnit: data['time_unit'],
-          month: data['month'], year: data['year']});
-      })
+          return this.setState({activities: data['activities'],
+            chartTypes: data['chart_types'], timeUnit: data['time_unit'],
+            month: data['month'], year: data['year']});
+        })
   }
 
   hideModal() {
@@ -305,17 +306,18 @@ class App extends Component {
       year: this.state.year
     };
 
-    axios.post('https://pause-api.appspot.com/api/pause/activities', data)
-      .then(res => {
-        return this.setState({displayModal: true, serverStatus: 'success',
-          modalMessage: 'You can view your activities here:',
-          modalLink: window.location.origin + '/?activities=' + res.data});
-      })
-      .catch(error => {
-        return this.setState({displayModal: true, serverStatus: 'fail',
-          modalMessage: 'Your activities could not be saved. Please try ' +
-          'again soon.', modalLink: null});
-      })
+    axios.post('https://pause-app-api.herokuapp.com/api/pause/activities',
+      data)
+        .then(res => {
+          return this.setState({displayModal: true, serverStatus: 'success',
+            modalMessage: 'You can view your activities here:',
+            modalLink: window.location.origin + '/?activities=' + res.data});
+        })
+        .catch(error => {
+          return this.setState({displayModal: true, serverStatus: 'fail',
+            modalMessage: 'Your activities could not be saved. Please try ' +
+            'again soon.', modalLink: null});
+        })
   }
 
   render() {
