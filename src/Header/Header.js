@@ -36,6 +36,8 @@ class Header extends Component {
         favicon: 'https://pause.crystalprism.io/favicon.ico'},
       {link: 'https://marian.crystalprism.io/', title: 'Marian',
         favicon: 'https://marian.crystalprism.io/favicon.ico'},
+        {link: 'https://vroom.crystalprism.io/', title: 'Vroom',
+          favicon: 'https://vroom.crystalprism.io/favicon.ico'},
       {link: 'https://crystalprism.io/user/sign-in/', title: 'Account',
         favicon: 'https://crystalprism.io/favicon.ico'}
     ]
