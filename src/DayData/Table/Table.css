@@ -33,6 +33,7 @@ td {
 
 td button {
   width: 21px;
+  background: none;
 }
 
 td button:hover {
