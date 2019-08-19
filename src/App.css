@@ -111,11 +111,11 @@ select {
   color: #ffffff;
 }
 
-#save:hover {
+#save:hover, #save:disabled {
   background-color: #0db902;
 }
 
-#save:active {
+#save:active, #save:disabled {
   box-shadow: none !important;
 }
 

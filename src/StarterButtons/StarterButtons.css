@@ -9,11 +9,11 @@
   color: #ffffff;
 }
 
-#button-container button:hover {
+#button-container button:hover, #button-container button:disabled {
   background-color: #0078e0;
 }
 
-#button-container button:active {
+#button-container button:active, #button-container button:disabled {
   box-shadow: none !important;
 }
 

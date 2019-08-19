@@ -59,9 +59,13 @@ button {
   cursor: pointer;
 }
 
-button:active {
+button:active, button:disabled {
   outline: none;
   text-shadow: 0.3px 0.3px 0px #000000;
+}
+
+button:disabled {
+  cursor: not-allowed !important;
 }
 
 #footer {

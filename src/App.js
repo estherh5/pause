@@ -306,14 +306,20 @@ class App extends Component {
       year: this.state.year
     };
 
+    this.setState({serverStatus: 'loading'});
+
+    document.body.style.cursor = 'wait';
+
     axios.post('https://pause-app-api.herokuapp.com/api/pause/activities',
       data)
         .then(res => {
+          document.body.style.cursor = '';
           return this.setState({displayModal: true, serverStatus: 'success',
             modalMessage: 'You can view your activities here:',
             modalLink: window.location.origin + '/?activities=' + res.data});
         })
         .catch(error => {
+          document.body.style.cursor = '';
           return this.setState({displayModal: true, serverStatus: 'fail',
             modalMessage: 'Your activities could not be saved. Please try ' +
             'again soon.', modalLink: null});
@@ -350,6 +356,8 @@ class App extends Component {
               <button
                 title="Toggle month"
                 data-direction="decrement"
+                disabled={this.state.serverStatus === 'loading' ||
+                  this.state.displayModal}
                 onClick={this.toggleMonth}>
                   <i
                     className="fas fa-chevron-left"
@@ -359,6 +367,8 @@ class App extends Component {
               <button
                 title="Toggle month"
                 data-direction="increment"
+                disabled={this.state.serverStatus === 'loading' ||
+                  this.state.displayModal}
                 onClick={this.toggleMonth}>
                 <i
                   className="fas fa-chevron-right"
@@ -381,10 +391,16 @@ class App extends Component {
           )}
           </div>
           <div id="button-container">
-            <StarterButtons onButtonClick={this.replaceActivities} />
+            <StarterButtons
+              disabled={this.state.serverStatus === 'loading' ||
+                this.state.displayModal}
+              onButtonClick={this.replaceActivities} />
           </div>
           <div id="save-container">
-            <button id="save" onClick={this.postData}>Save</button>
+            <button id="save"
+              disabled={this.state.serverStatus === 'loading' ||
+                this.state.displayModal}
+              onClick={this.postData}>Save</button>
           </div>
           <Calculator activities={this.state.activities} />
         </div>
