@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "ajv": "^6.5.1",
+    "ajv": "^6.12.3",
     "axios": "^0.21.2",
     "chart.js": "^2.9.4",
     "lodash": "^4.17.21",
