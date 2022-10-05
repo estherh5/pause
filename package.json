@@ -7,9 +7,9 @@
     "axios": "^0.21.2",
     "chart.js": "^2.9.4",
     "lodash": "^4.17.21",
-    "react": "^16.4.1",
+    "react": "^16.14.0",
     "react-chartjs-2": "^2.7.2",
-    "react-dom": "^16.4.2",
+    "react-dom": "^16.14.0",
     "react-scripts": "5.0.1"
   },
   "scripts": {
