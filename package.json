@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "ajv": "^6.12.3",
-    "axios": "^0.21.2",
+    "axios": "^1.6.0",
     "chart.js": "^2.9.4",
     "lodash": "^4.17.21",
     "react": "^16.14.0",
