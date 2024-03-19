@@ -36,11 +36,14 @@ class App extends Component {
       modalLink: null
     };
 
+    this.apiUrl = window.location.hostname === 'pause.crystalprism.io' ?
+      'https://pause-app-api-4611c9bb3463.herokuapp.com/api' : 'http://localhost:5000/api';
+
     // Set starting activities for new day
     this.startingActivities = [
       {id: 0, value: 24, label: '', color: '#DCDCDC'},
       {id: '?', value: '', label: ''}
-    ]
+    ];
 
     /* List of months to convert from current month number if time unit is
     'month' */
@@ -72,8 +75,7 @@ class App extends Component {
 
   // Load activities data from server for specified data id
   getData(dataId) {
-    axios.get('https://pause-app-api.herokuapp.com/api/pause/activities/' +
-      dataId)
+    axios.get(`${this.apiUrl}/pause/activities/${dataId}`)
         .then(res => {
           const data = res.data;
 
@@ -310,8 +312,7 @@ class App extends Component {
 
     document.body.style.cursor = 'wait';
 
-    axios.post('https://pause-app-api.herokuapp.com/api/pause/activities',
-      data)
+    axios.post(`${this.apiUrl}/pause/activities`, data)
         .then(res => {
           document.body.style.cursor = '';
           return this.setState({displayModal: true, serverStatus: 'success',
