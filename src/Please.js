@@ -1,12 +1,5 @@
 /*!Please JS v0.4.2, Jordan Checkman 2014, Checkman.io, MIT License, Have fun.*/
-(function( globalName, root, factory ) {
-	if ( typeof exports === 'object' ) {
-		module.exports = factory();
-	}
-	else{
-		root[globalName] = factory();
-	}
-}('Please', this, function(){
+const Please = (function(){
 	function define_Please(){
 		var Please = {};
 		var color_data = {
@@ -703,4 +696,6 @@
 		return Please;
 	}
 	return define_Please();
-}));
+})();
+
+export default Please;

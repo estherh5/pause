@@ -51,6 +51,13 @@
   cursor: pointer;
 }
 
+#site-menu-icon-container button {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
 #site-menu-icon {
   height: 30px;
   left: 0px;

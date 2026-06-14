@@ -25,6 +25,10 @@
   top: 15px;
   right: 15px;
   font-size: 15px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
 .modal-header {
@@ -84,6 +88,10 @@
 
 .link-container button {
   font-size: 13px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
 .link-container button:hover {
