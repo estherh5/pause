@@ -13,8 +13,7 @@ import Header from './Header/Header.jsx';
 import Modal from './Modal/Modal.jsx';
 import StarterButtons from './StarterButtons/StarterButtons.jsx';
 
-const PRODUCTION_API_URL =
-  'https://pause-app-api-4611c9bb3463.herokuapp.com/api';
+const PRODUCTION_API_URL = 'https://pause-api.crystalprism.io/api';
 
 function getApiUrl() {
   if (import.meta.env.VITE_API_URL) {
