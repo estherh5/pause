@@ -8,6 +8,14 @@ import { describe, it, expect, vi } from 'vitest';
  * unstubbed fetch a refusal rather than a request; these cases are what stop
  * it being quietly deleted or configured away.
  */
+
+/**
+ * Captured before any beforeEach runs. A module that calls fetch at import
+ * time is protected only by the setup file's module-load assignment — the
+ * beforeEach re-arm comes too late for it — so this is what pins that line.
+ */
+const fetchAtImport = globalThis.fetch;
+
 describe('the test-environment network guard', () => {
   it('refuses an unstubbed fetch, naming the target', async () => {
     await expect(
@@ -44,5 +52,9 @@ describe('the test-environment network guard', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }));
     vi.unstubAllGlobals();
     await expect(fetch('http://127.0.0.1:9/')).rejects.toThrow(/Blocked a real network call/);
+  });
+
+  it('is already installed at import time, before any beforeEach runs', async () => {
+    await expect(fetchAtImport('http://127.0.0.1:9/')).rejects.toThrow(/Blocked a real network call/);
   });
 });
