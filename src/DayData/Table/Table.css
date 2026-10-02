@@ -44,6 +44,23 @@ td button:active {
   text-shadow: 0.5px 0.5px 0px #000000;
 }
 
+.add {
+  position: relative;
+  font-size: 12px;
+}
+
+@media (pointer: coarse) {
+  .add::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    margin: -22px 0 0 -22px;
+  }
+}
+
 .delete {
   visibility: hidden;
   font-size: 14px;

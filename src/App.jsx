@@ -84,7 +84,7 @@ function App() {
         });
       } catch (error) {
         if (error.name !== 'AbortError') {
-          showError('Your activities could not be loaded. Please try again soon.');
+          showError('Your activities could not be loaded. Try again soon.');
         }
       }
     }
@@ -191,11 +191,11 @@ function App() {
       setModal({
         display: true,
         status: 'success',
-        message: 'You can view your activities here:',
+        message: null,
         link: `${window.location.origin}/?activities=${dataId}`,
       });
     } catch {
-      showError('Your activities could not be saved. Please try again soon.');
+      showError('Your activities could not be saved. Try again soon.');
     } finally {
       document.body.style.cursor = '';
       setIsSaving(false);

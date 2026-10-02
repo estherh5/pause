@@ -208,8 +208,13 @@ function Table({
                 </td>
                 <td>
                   {isNew ? (
-                    <button title="Add activity" onClick={createActivity}>
-                      Add
+                    <button
+                      className="add"
+                      title="Add activity"
+                      aria-label="Add activity"
+                      onClick={createActivity}
+                    >
+                      <i className="fas fa-plus" aria-hidden="true" />
                     </button>
                   ) : !isRemaining ? (
                     <button
