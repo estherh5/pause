@@ -6,6 +6,7 @@ Committed doc, not scratch. Kept current by hand as work ships.
 
 ## Shipped
 
+- **2026-10** [security] Dependabot on: alerts enabled, `.github/dependabot.yml` (weekly npm, minor+patch grouped, 3-day cooldown), `npm audit fix` cleared 28 of 28 alerts; nothing left.
 - 2026-10 Copy pass: tighter wording, no em-dashes (fleet copy standard).
 
 ## Next
