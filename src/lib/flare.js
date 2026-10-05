@@ -56,6 +56,36 @@ export function boundContext(context) {
   return context;
 }
 
+/**
+ * The diagnosis an error carries on itself: a plain-object `params` and up to
+ * three links of its `cause` chain (name and message only, never a cause's
+ * stack). Ported from flare/reporters/next/lib/flare.ts#errorDetail, which has
+ * the full rationale. Both keys are `_`-prefixed so they cannot collide with a
+ * caller's context, and the result still passes through `boundContext`.
+ */
+export function errorDetail(error) {
+  const detail = {};
+
+  const params = error.params;
+  // A plain object only. An array or a scalar `params` is somebody else's field
+  // by that name, not a diagnostic payload.
+  if (params !== null && typeof params === 'object' && !Array.isArray(params)) {
+    detail._params = params;
+  }
+
+  const chain = [];
+  const seen = new Set();
+  let cause = error.cause;
+  while (cause instanceof Error && chain.length < 3 && !seen.has(cause)) {
+    seen.add(cause);
+    chain.push({ name: cause.name || 'Error', message: cause.message || '' });
+    cause = cause.cause;
+  }
+  if (chain.length > 0) detail._cause = chain;
+
+  return detail;
+}
+
 export function buildPayload(err, context = {}) {
   const { kind, url, ...rest } = context;
   const error = err instanceof Error ? err : new Error(typeof err === 'string' ? err : 'Unknown error');
@@ -68,7 +98,7 @@ export function buildPayload(err, context = {}) {
     release: RELEASE,
     environment: 'production',
     occurredAt: Date.now(),
-    context: boundContext(rest),
+    context: boundContext({ ...rest, ...errorDetail(error) }),
   };
 }
 
