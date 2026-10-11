@@ -3,17 +3,17 @@ import './Header.css';
 
 const PROJECTS = [
   ['https://crystalprism.io/', 'Home', 'https://crystalprism.io/favicon.ico'],
-  ['https://crystalprism.io/timespace/', 'Timespace', 'https://crystalprism.io/timespace/favicon.ico'],
-  ['https://crystalprism.io/shapes-in-rain/', 'Shapes in Rain', 'https://crystalprism.io/shapes-in-rain/favicon.ico'],
-  ['https://crystalprism.io/rhythm-of-life/', 'Rhythm of Life', 'https://crystalprism.io/rhythm-of-life/favicon.ico'],
-  ['https://crystalprism.io/canvashare/', 'CanvaShare', 'https://crystalprism.io/canvashare/favicon.ico'],
-  ['https://crystalprism.io/thought-writer/', 'Thought Writer', 'https://crystalprism.io/thought-writer/favicon.ico'],
-  ['https://crystalprism.io/vicarious/', 'Vicarious', 'https://crystalprism.io/vicarious/favicon.ico'],
+  ['https://timespace.crystalprism.io/', 'Timespace', 'https://timespace.crystalprism.io/favicon.ico'],
+  ['https://shapes-in-rain.crystalprism.io/', 'Shapes in Rain', 'https://shapes-in-rain.crystalprism.io/favicon.ico'],
+  ['https://rhythm-of-life.crystalprism.io/', 'Rhythm of Life', 'https://rhythm-of-life.crystalprism.io/favicon.ico'],
+  ['https://canvashare.crystalprism.io/', 'CanvaShare', 'https://canvashare.crystalprism.io/favicon.ico'],
+  ['https://thought-writer.crystalprism.io/', 'Thought Writer', 'https://thought-writer.crystalprism.io/favicon.ico'],
+  ['https://vicarious.crystalprism.io/', 'Vicarious', 'https://vicarious.crystalprism.io/favicon.ico'],
   ['https://hn-stats.crystalprism.io/', 'Hacker News Stats', 'https://hn-stats.crystalprism.io/favicon.ico'],
   ['https://pause.crystalprism.io/', 'Pause', 'https://pause.crystalprism.io/favicon.ico'],
   ['https://marian.crystalprism.io/', 'Marian', 'https://marian.crystalprism.io/favicon.ico'],
   ['https://vroom.crystalprism.io/', 'Vroom', 'https://vroom.crystalprism.io/favicon.ico'],
-  ['https://crystalprism.io/user/sign-in/', 'Account', 'https://crystalprism.io/favicon.ico'],
+  ['https://account.crystalprism.io/sign-in/', 'Account', 'https://crystalprism.io/favicon.ico'],
 ].map(([link, title, favicon]) => ({ link, title, favicon }));
 
 function Header() {
