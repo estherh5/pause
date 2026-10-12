@@ -25,8 +25,10 @@
 }
 
 /* The global a:hover green would land on the tile's gray hover wash at about
-   1.4:1; the wash already marks hover, so the name keeps its ink. */
-.fleet-app:hover {
+   1.4:1, and on the footer's white at 1.7:1; both keep their ink (the tile
+   wash and the footer underline already mark hover). */
+.fleet-app:hover,
+.fleet-footer a:hover {
   color: inherit;
 }
 
