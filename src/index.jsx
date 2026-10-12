@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import { FlareBoundary } from './components/FlareBoundary.jsx';
+import { FleetFooter } from './components/FleetFooter';
 import './index.css';
 
 createRoot(document.getElementById('root')).render(
@@ -12,14 +13,7 @@ createRoot(document.getElementById('root')).render(
   </StrictMode>,
 );
 
-createRoot(document.getElementById('footer')).render(
-  <span>
-    © Copyright 2017-{new Date().getFullYear()}{' '}
-    <a href="https://crystalprism.io" title="Crystal Prism">
-      Crystal Prism
-    </a>
-  </span>,
-);
+createRoot(document.getElementById('footer')).render(<FleetFooter />);
 
 // PORTED from flare/reporters/next/components/FlareClient.tsx, by way of the
 // same block in methods/src/main.tsx — a genuine port, not a copy: that

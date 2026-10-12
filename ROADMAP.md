@@ -6,6 +6,7 @@ Committed doc, not scratch. Kept current by hand as work ships.
 
 ## Shipped
 
+- **2026-10 — Fleet apps + account menu and footer.** The old table-style site menu (top-left) is gone; the fleet kit's apps menu sits at the header's trailing end, listing every live app from `crystalprism.io/apps.json` (baked fallback on failure), with no account rows since pause has no sign-in. `FleetFooter` replaces the inline copyright. Kit copied byte-identical into `src/components` + `src/lib`; tokens in `src/index.css`.
 - 2026-10 Flare reports now carry a wrapped error's `params` and its `cause` chain (`errorDetail` in `src/lib/flare.js`, ported from the Next template), with the template's six cases in `src/lib/flare.test.js`.
 - 2026-10 Dev-dependency majors: vitest 5, jsdom 30, @testing-library/jest-dom 7, globals 17 (Dependabot #66, #69, #70, #65). No config or code changes needed.
 - **2026-10** [security] Dependabot on: alerts enabled, `.github/dependabot.yml` (weekly npm, minor+patch grouped, 3-day cooldown), `npm audit fix` cleared 28 of 28 alerts; nothing left.
