@@ -29,6 +29,7 @@ function Header() {
         signInHref={null}
         signOutAction={null}
         placement="down-end"
+        triggerClassName="pause-fleet-trigger"
       />
     </header>
   );

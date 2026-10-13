@@ -6,3 +6,37 @@
   right: 16px;
   z-index: 3;
 }
+
+/* The fleet trigger in pause's own button language (#button-container, #save):
+   no border, a 5px corner, the 1px gray drop that goes flat on press, and a
+   fill that shifts on hover, no transition, no transform. Black is the fill
+   because it is the fleet accent here, and the focus ring stays black rather
+   than the app's green, which is 1.7:1 on white. Two classes, so the global
+   `button` reset (border: none, padding: 0) and the green `*:focus` outline
+   in index.css can't reach past it, and the kit's own look sits at zero
+   specificity beneath. */
+.fleet-trigger.pause-fleet-trigger {
+  inline-size: 44px;
+  block-size: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 1px 1px 1px #b7b7b7;
+  background-color: #000000;
+  color: #ffffff;
+  transition: none;
+}
+
+.fleet-trigger.pause-fleet-trigger:hover {
+  background-color: #333333;
+}
+
+.fleet-trigger.pause-fleet-trigger:active {
+  box-shadow: none;
+  transform: none;
+}
+
+.fleet-trigger.pause-fleet-trigger:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 3px;
+}
