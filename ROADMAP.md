@@ -15,6 +15,7 @@ Committed doc, not scratch. Kept current by hand as work ships.
 
 ## Next
 
+- [from 2026-10-14] **Finish the Vercel cutover.** The first production deploy of Vercel project `pause` was refused by Vercel's Hobby daily deploy cap on 2026-10-13 (resets about 12:30 EDT). Turso DB `pause`, its backup, the 11 production env vars, the Google redirect URIs and the 4 legacy shares are already in place. Left: deploy and run the Task 20 Step 5 checks (plausible tag, `/stats` 200, `/api/me` signed-out, anonymous share round-trip, `/api/plans` 401, source map 200); compare every legacy share against `pause-api.crystalprism.io`; point `pause.crystalprism.io` at Vercel (Namecheap CNAME, needs Esther), re-copy Neon shares made during propagation with `scripts/copy-legacy-shares.mjs`, then stand Netlify down (keep the site). Full steps and rulings: `~/Developer/pause/tasks/handoff.md` if present, else the SDD ledger in the `pause-fc7abee9` worktree.
 - [from 2026-10-27] **Retire pause_api.** Confirm zero requests on `pause-api.crystalprism.io` for 14 days in Vercel logs, remove its Vercel project domain, archive the repo. The Neon table is dropped only with a fresh dump and a separate approval.
 - **Feedback inbound replies.** Wire replies to feedback emails back in; pick an unused one-letter prefix (`p` is passage's).
 - **Update the skill chips on crystalprism.io and estherhoffman.com** once pause_api is retired (pause no longer depends on it).
