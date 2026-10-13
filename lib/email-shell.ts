@@ -399,8 +399,8 @@ function resolveCtaColorsForScheme(ground: string, ink: string, accent: string):
  * Measured across the fleet: seven of eleven apps' `ground` fails 4.5:1
  * against their `accent` — tide's own passes, which is exactly why the bug
  * was invisible here. pause is one of the seven: its accent (#0edc00)
- * measures only 2.02:1 against `ground`, so this derivation resolving to
- * `ink` (7.30:1) is what keeps pause' CTA legible at all.
+ * measures only 1.87:1 against `ground`, so this derivation resolving to
+ * `ink` (11.26:1) is what keeps pause's CTA legible at all.
  *
  * Resolves BOTH schemes independently — the light and dark palettes are
  * unrelated colours, so the light winner (ground or ink) is not assumed to

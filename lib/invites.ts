@@ -129,13 +129,15 @@ export async function acceptInvite(token: string, sessionEmail: string, now: num
 
 /** Owner-facing status, derived from the row rather than stored — a stored
  *  status is a second source of truth that drifts from the timestamps. */
-export type InviteStatus = 'pending' | 'accepted' | 'revoked' | 'expired';
+export type InviteStatus = 'invited' | 'accepted' | 'expired' | 'revoked' | 'removed';
 
 export function statusOf(row: InviteRow, now: number): InviteStatus {
-  if (row.revokedAt != null) return 'revoked';
-  if (row.expiresAt <= now) return 'expired';
+  if (row.revokedAt != null) return row.acceptedAt != null ? 'removed' : 'revoked';
+  // Accepted before expired: the invite row IS the account, and expiry only
+  // limits the link, never a member who already used it.
   if (row.acceptedAt != null) return 'accepted';
-  return 'pending';
+  if (row.expiresAt <= now) return 'expired';
+  return 'invited';
 }
 
 export async function listInvites(): Promise<InviteRow[]> {
@@ -147,8 +149,12 @@ export async function createInvite(opts: {
   note: string | null;
   invitedBy: string;
   now: number;
-}): Promise<InviteRow> {
+}): Promise<InviteRow | 'already-member'> {
   const email = opts.email.toLowerCase();
+  // The invite row IS the account: re-inviting an active member would reset
+  // acceptedAt and silently remove them, so it is refused instead.
+  const existing = await inviteByEmail(email);
+  if (existing && existing.acceptedAt != null && existing.revokedAt == null) return 'already-member';
   const token = newInviteToken();
   const values = {
     id: randomUUID(),
@@ -175,13 +181,18 @@ export async function createInvite(opts: {
 }
 
 /** A fresh token for the same invitation, so a resend supersedes the old link. */
-export async function rotateToken(id: string, now: number): Promise<InviteRow | null> {
+export async function rotateToken(id: string, now: number): Promise<InviteRow | null | 'revoked'> {
+  // A revoked row (withdrawn invite or removed member) never comes back by
+  // resend: Restore is the only way back.
+  const [prior] = await db.select().from(invites).where(eq(invites.id, id));
+  if (!prior) return null;
+  if (prior.revokedAt != null) return 'revoked';
   const [row] = await db
     .update(invites)
-    .set({ token: newInviteToken(), expiresAt: now + INVITE_TTL_MS, revokedAt: null })
-    .where(eq(invites.id, id))
+    .set({ token: newInviteToken(), expiresAt: now + INVITE_TTL_MS })
+    .where(and(eq(invites.id, id), isNull(invites.revokedAt)))
     .returning();
-  return row ?? null;
+  return row ?? 'revoked';
 }
 
 export async function revokeInvite(id: string, now: number): Promise<void> {

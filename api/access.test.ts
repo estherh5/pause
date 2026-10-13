@@ -178,11 +178,54 @@ describe('removing a member', () => {
     // The owner's list shows it revoked, with acceptedAt kept (the UI's "removed").
     h.email = OWNER;
     const list = (await call({ method: 'GET' })).json as Array<{ status: string; acceptedAt: number | null }>;
-    expect(list[0]).toMatchObject({ status: 'revoked' });
+    expect(list[0]).toMatchObject({ status: 'removed' });
     expect(list[0].acceptedAt).not.toBeNull();
 
     await call({ method: 'POST', query: { action: 'restore' }, body: { id: row.id } });
     expect(await roleForEmail(h.db, 'friend@example.com')).toBe('member');
+  });
+});
+
+describe('re-inviting and resending', () => {
+  it('re-inviting an active member answers 409 already-member, sends nothing, keeps access', async () => {
+    const { row } = await issue();
+    h.email = 'friend@example.com';
+    await call({ method: 'POST', query: { action: 'accept' }, body: { token: row.token } });
+    h.sent = [];
+    h.email = OWNER;
+    const r = await call({ method: 'POST', body: { email: 'friend@example.com' } });
+    expect(r.status).toBe(409);
+    expect(r.json).toEqual({ error: 'already-member' });
+    expect(h.sent).toEqual([]);
+    expect(await roleForEmail(h.db, 'friend@example.com')).toBe('member');
+  });
+
+  it('re-inviting a removed member issues a fresh invitation', async () => {
+    const { row } = await issue();
+    h.email = 'friend@example.com';
+    await call({ method: 'POST', query: { action: 'accept' }, body: { token: row.token } });
+    h.email = OWNER;
+    await call({ method: 'POST', query: { action: 'revoke' }, body: { id: row.id } });
+    const r = await call({ method: 'POST', body: { email: 'friend@example.com' } });
+    expect(r.status).toBe(201);
+    expect(r.json).toMatchObject({ status: 'invited' });
+    expect(h.sent.length).toBe(2);
+  });
+
+  it('resend on a revoked row answers 409 revoked, sends nothing, changes nothing', async () => {
+    const { row } = await issue();
+    h.email = 'friend@example.com';
+    await call({ method: 'POST', query: { action: 'accept' }, body: { token: row.token } });
+    h.email = OWNER;
+    await call({ method: 'POST', query: { action: 'revoke' }, body: { id: row.id } });
+    h.sent = [];
+    const [before] = await h.db.select().from(invites);
+    const r = await call({ method: 'POST', query: { action: 'resend' }, body: { id: row.id } });
+    expect(r.status).toBe(409);
+    expect(r.json).toEqual({ error: 'revoked' });
+    expect(h.sent).toEqual([]);
+    expect((await h.db.select().from(invites))[0]).toEqual(before);
+    expect(await roleForEmail(h.db, 'friend@example.com')).toBeNull();
   });
 });
 
@@ -202,7 +245,7 @@ describe('issuing', () => {
     expect(response.status).toBe(201);
     expect(h.sent).toEqual([{ to: 'friend@example.com', token: row.token }]);
     expect(row.emailStatus).toBe('sent');
-    expect(response.json).toMatchObject({ status: 'pending', email: 'friend@example.com' });
+    expect(response.json).toMatchObject({ status: 'invited', email: 'friend@example.com' });
   });
 
   it('refuses something that is not an address, and writes nothing', async () => {

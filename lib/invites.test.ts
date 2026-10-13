@@ -30,8 +30,11 @@ beforeEach(async () => {
   h.db = await makeMigratedDb();
 });
 
-const issue = (over: Partial<{ email: string; note: string | null; now: number }> = {}) =>
-  createInvite({ email: over.email ?? 'Friend@Example.com', note: over.note ?? 'come read the rye one', invitedBy: OWNER, now: over.now ?? NOW });
+const issue = async (over: Partial<{ email: string; note: string | null; now: number }> = {}) => {
+  const r = await createInvite({ email: over.email ?? 'Friend@Example.com', note: over.note ?? 'come read the rye one', invitedBy: OWNER, now: over.now ?? NOW });
+  if (r === 'already-member') throw new Error('already-member');
+  return r;
+};
 
 describe('tokens', () => {
   it('are 256 bits of CSPRNG, not a UUID', () => {
@@ -195,7 +198,7 @@ describe('the gate', () => {
     await restoreInvite(row.id, NOW + 2);
     expect(await roleForEmail(h.db, 'friend@example.com')).toBeNull();
     const [inv] = await h.db.select().from(invites);
-    expect(statusOf(inv, NOW + 3)).toBe('pending');
+    expect(statusOf(inv, NOW + 3)).toBe('invited');
   });
 });
 
@@ -221,9 +224,42 @@ describe('issuing and re-issuing', () => {
   it('a resend supersedes the previous link', async () => {
     const row = await issue();
     const rotated = await rotateToken(row.id, NOW + 1000);
-    expect(rotated!.token).not.toBe(row.token);
+    if (rotated === null || rotated === 'revoked') throw new Error('expected a row');
+    expect(rotated.token).not.toBe(row.token);
     expect(await resolveInviteView(row.token, NOW + 1000)).toEqual({ state: 'invalid' });
-    expect(await resolveInviteView(rotated!.token, NOW + 1000)).toMatchObject({ state: 'valid' });
+    expect(await resolveInviteView(rotated.token, NOW + 1000)).toMatchObject({ state: 'valid' });
+  });
+
+  it('re-inviting an ACTIVE member is refused and changes nothing', async () => {
+    const row = await issue();
+    await acceptInvite(row.token, 'friend@example.com', NOW);
+    const before = (await h.db.select().from(invites))[0];
+    expect(await createInvite({ email: 'FRIEND@example.com', note: 'x', invitedBy: OWNER, now: NOW + 5_000 })).toBe('already-member');
+    expect((await h.db.select().from(invites))[0]).toEqual(before);
+    expect(await roleForEmail(h.db, 'friend@example.com')).toBe('member');
+  });
+
+  it('re-inviting a REMOVED member (revoked + accepted) starts a fresh invitation', async () => {
+    const row = await issue();
+    await acceptInvite(row.token, 'friend@example.com', NOW);
+    await revokeInvite(row.id, NOW + 1);
+    const again = await issue({ now: NOW + 60_000 });
+    expect(again.token).not.toBe(row.token);
+    expect(again.revokedAt).toBeNull();
+    expect(again.acceptedAt).toBeNull();
+    expect(again.expiresAt).toBe(NOW + 60_000 + INVITE_TTL_MS);
+    expect(await roleForEmail(h.db, 'friend@example.com')).toBeNull();
+  });
+
+  it('resend on a revoked row (removed member) is refused and changes nothing', async () => {
+    const row = await issue();
+    await acceptInvite(row.token, 'friend@example.com', NOW);
+    await revokeInvite(row.id, NOW + 1);
+    const before = (await h.db.select().from(invites))[0];
+    expect(await rotateToken(row.id, NOW + 2)).toBe('revoked');
+    expect((await h.db.select().from(invites))[0]).toEqual(before);
+    expect(await roleForEmail(h.db, 'friend@example.com')).toBeNull();
+    expect(await rotateToken('no-such-id', NOW)).toBeNull();
   });
 
   it('restoring a revoked-AND-expired invitation gives it a real life again', async () => {
@@ -239,11 +275,17 @@ describe('issuing and re-issuing', () => {
 
 describe('statusOf', () => {
   const base = { id: 'i', email: 'a@b.co', token: 't', invitedBy: null, note: null, createdAt: NOW, expiresAt: NOW + 1000, acceptedAt: null, revokedAt: null, emailStatus: null };
-  it('reads revoked before expired before accepted', () => {
-    expect(statusOf({ ...base, revokedAt: NOW, expiresAt: NOW - 1, acceptedAt: NOW }, NOW)).toBe('revoked');
-    expect(statusOf({ ...base, expiresAt: NOW - 1, acceptedAt: NOW }, NOW)).toBe('expired');
-    expect(statusOf({ ...base, acceptedAt: NOW }, NOW)).toBe('accepted');
-    expect(statusOf(base, NOW)).toBe('pending');
+  it('orders removed/revoked, accepted, expired, invited', () => {
+    expect(statusOf({ ...base, revokedAt: NOW, expiresAt: NOW - 1, acceptedAt: NOW }, NOW)).toBe('removed');
+    expect(statusOf({ ...base, revokedAt: NOW }, NOW)).toBe('revoked');
+    expect(statusOf({ ...base, expiresAt: NOW - 1, acceptedAt: NOW }, NOW)).toBe('accepted');
+    expect(statusOf({ ...base, expiresAt: NOW - 1 }, NOW)).toBe('expired');
+    expect(statusOf(base, NOW)).toBe('invited');
+  });
+  it('an active member is still accepted 15 days after the invite was sent', () => {
+    const fifteenDays = 15 * 24 * 60 * 60 * 1000;
+    const row = { ...base, expiresAt: NOW + INVITE_TTL_MS, acceptedAt: NOW };
+    expect(statusOf(row, NOW + fifteenDays)).toBe('accepted');
   });
   it('agrees with isDead about who is dead', () => {
     for (const row of [

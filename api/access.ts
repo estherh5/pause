@@ -13,7 +13,6 @@ import {
   resolveInviteView,
   restoreInvite,
   revokeInvite,
-  revokeInviteForEmail,
   rotateToken,
   setEmailStatus,
   statusOf,
@@ -103,7 +102,11 @@ async function invites(req: VercelRequest, res: VercelResponse) {
       return;
     }
     const rawNote = String(readBody(req).note ?? '').trim();
-        const row = await createInvite({ email, note: rawNote || null, invitedBy: owner, now });
+    const row = await createInvite({ email, note: rawNote || null, invitedBy: owner, now });
+    if (row === 'already-member') {
+      res.status(409).json({ error: 'already-member' });
+      return;
+    }
     const status = await sendAccountInvite(email, { token: row.token, note: row.note });
     await setEmailStatus(row.id, status);
     res.status(201).json({ ...toAdminRow({ ...row, emailStatus: status }, now) });
@@ -117,6 +120,10 @@ async function invites(req: VercelRequest, res: VercelResponse) {
     const row = await rotateToken(id, now);
     if (!row) {
       res.status(404).json({ error: 'not found' });
+      return;
+    }
+    if (row === 'revoked') {
+      res.status(409).json({ error: 'revoked' });
       return;
     }
     const status = await sendAccountInvite(row.email, { token: row.token, note: row.note });
