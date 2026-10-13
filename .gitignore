@@ -21,3 +21,15 @@ yarn-error.log*
 
 # netlify CLI link state (local only)
 /.netlify
+
+# Agent scratch, never durable
+.superpowers/
+/docs/superpowers/
+/tasks/
+/.claude/
+
+# Vercel + local database
+.vercel
+.env
+local.db
+local.db-*
