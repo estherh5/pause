@@ -28,8 +28,13 @@ export function PlannerProvider({ children }) {
 
   // /plans renamed (patch) or deleted (null) a plan: keep the plan on screen in step.
   const syncCurrentPlan = useCallback((id, patch) => {
-    setCurrentPlan((p) => (p && p.id === id ? (patch ? { ...p, ...patch } : null) : p));
-  }, []);
+    if (!currentPlan || currentPlan.id !== id) return;
+    if (patch) { setCurrentPlan({ ...currentPlan, ...patch }); return; }
+    // Deleted: the work on screen is no longer saved anywhere, so measure it
+    // against an unsaved new plan's baseline and let it read as dirty.
+    setCurrentPlan(null);
+    setBaseline(scheduleKey(createInitialSchedule()));
+  }, [currentPlan]);
 
   const value = useMemo(() => ({
     schedule, setSchedule, currentPlan, loadedShareId, isDirty: scheduleKey(schedule) !== baseline,

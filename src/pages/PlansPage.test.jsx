@@ -194,6 +194,15 @@ describe('/plans', () => {
       expect(dialog.queryByRole('button', { name: 'Save changes' })).toBeNull();
       expect(dialog.queryByRole('button', { name: 'Save as new plan' })).toBeNull();
     });
+    it('deleting the open plan: the orphaned work counts as unsaved, so New plan asks first', async () => {
+      const user = userEvent.setup();
+      await openThenPlans(user);
+      await user.click(await screen.findByRole('button', { name: 'Delete Week' }));
+      await user.click(screen.getByRole('button', { name: 'Delete' }));
+      await screen.findByText('No saved plans yet.');
+      await user.click(screen.getByRole('button', { name: '+ New plan' }));
+      expect(screen.getByRole('dialog', { name: 'Start a new plan?' })).toBeInTheDocument();
+    });
   });
 });
 
