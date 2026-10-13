@@ -26,5 +26,5 @@ Committed doc, not scratch. Kept current by hand as work ships.
 
 ## Open questions
 
-- **pause to almanac integration.** Spec §9 of the saved-plans design left open whether saved plans should feed almanac; settle by Esther.
+- **Should almanac read pause's saved plans as a source (pause to almanac)?** Almanac reads Turso dumps from `~/blob-backups/db/` locally, and a saved plan is a dated intention almanac could set beside what actually happened. Roughly 2h of work on almanac's side, nothing on pause's. Not approved; settle by Esther saying yes or no.
 - **Should the planner keep an unsaved plan across reloads (form drafts)?** It changes anonymous behavior; settle by Esther.
