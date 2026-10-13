@@ -162,11 +162,16 @@ export default function PlansPage({ me }) {
     statusTimer.current = window.setTimeout(() => setStatus(''), 2000);
   }
   function onRemoved(id) {
-    // Focus the next row's Open link (or the title when the list empties).
+    // Focus the Open link of the row that takes the removed row's place, else the
+    // previous row's, else the title when the list empties. Pick the target row now,
+    // while the removed row is still in the DOM, then focus it a frame later.
+    const rows = [...(listRef.current?.querySelectorAll('.plan-row') ?? [])];
+    const at = rows.findIndex((r) => r.dataset.planId === id);
+    const target = rows[at + 1] ?? rows[at - 1];
+    const targetId = at >= 0 ? target?.dataset.planId : undefined;
     requestAnimationFrame(() => {
-      const rows = [...(listRef.current?.querySelectorAll('.plan-row') ?? [])].filter((r) => r.dataset.planId !== id);
-      const next = rows[0]?.querySelector('.plan-open');
-      (next ?? titleRef.current)?.focus();
+      const el = targetId === undefined ? null : [...(listRef.current?.querySelectorAll('.plan-row') ?? [])].find((r) => r.dataset.planId === targetId);
+      (el?.querySelector('.plan-open') ?? titleRef.current)?.focus();
     });
   }
 

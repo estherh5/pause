@@ -70,6 +70,27 @@ describe('/plans', () => {
     await waitFor(() => expect(screen.getByRole('link', { name: 'Open' })).toHaveFocus()); // the next row's Open
     expect(screen.queryByText('Week one')).toBeNull();
   });
+  async function deleteFromThree(victim, name) {
+    const user = userEvent.setup();
+    let list = [row('a', 'Week one'), row('b', 'Week two'), row('c', 'Week three')];
+    renderApp({ route: '/plans', me: member, routes: {
+      [`/api/plans/${victim}`]: () => { list = list.filter((p) => p.id !== victim); return new Response(null, { status: 204 }); },
+      '/api/plans': () => jsonResponse(list),
+    } });
+    await user.click(await screen.findByRole('button', { name: `Delete ${name}` }));
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    await waitFor(() => expect(screen.queryByText(name)).toBeNull());
+  }
+  it('deleting the middle of three focuses the formerly-third row Open link', async () => {
+    await deleteFromThree('b', 'Week two');
+    const third = screen.getByText('Week three').closest('li');
+    await waitFor(() => expect(within(third).getByRole('link', { name: 'Open' })).toHaveFocus());
+  });
+  it('deleting the last of three focuses the second row Open link', async () => {
+    await deleteFromThree('c', 'Week three');
+    const second = screen.getByText('Week two').closest('li');
+    await waitFor(() => expect(within(second).getByRole('link', { name: 'Open' })).toHaveFocus());
+  });
   it('Share copies the link and announces it', async () => {
     const user = userEvent.setup();
     const writeText = vi.spyOn(navigator.clipboard, 'writeText');
