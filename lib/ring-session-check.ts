@@ -1,5 +1,5 @@
 /**
- * THE RING SESSION CHECK — methods' half of `POST
+ * THE RING SESSION CHECK — pause's half of `POST
  * https://auth.crystalprism.io/api/session-check`.
  *
  * A password change on the auth service ends every ring session signed in

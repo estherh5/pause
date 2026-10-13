@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { withFlare } from './flare-server.js';
+import { withFlare, reportServerError, sanitizeForFlare } from './flare-server.js';
 import { callHandler } from '../test/http.js';
 
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
@@ -29,5 +29,18 @@ describe('withFlare', () => {
     vi.stubGlobal('fetch', async () => { throw new Error('network'); });
     const out = await callHandler(withFlare(async () => { throw new Error('x'); }), { method: 'GET' });
     expect(out.status).toBe(500);
+  });
+  it('never ships query params: message and stack are cut at "\nparams:"', async () => {
+    vi.stubEnv('VERCEL_ENV', 'production'); vi.stubEnv('FLARE_URL', 'u'); vi.stubEnv('FLARE_KEY', 'k');
+    const sent: string[] = [];
+    vi.stubGlobal('fetch', async (_u: string, init: RequestInit) => { sent.push(String(init.body)); return new Response(null, { status: 202 }); });
+    const err = new Error('Failed query: select 1\nparams: a@b.com');
+    err.stack = 'Error: Failed query: select 1\nparams: a@b.com\n    at x (file.ts:1:1)';
+    await reportServerError(err, '/api/plans');
+    expect(sent).toHaveLength(1);
+    expect(sent[0]).not.toContain('@');
+    expect(sent[0]).toContain('Failed query: select 1');
+    expect(sanitizeForFlare('q\nparams: 1\nmore')).toBe('q');
+    expect(sanitizeForFlare('plain')).toBe('plain');
   });
 });

@@ -39,7 +39,7 @@ describe('decodeSessionToken', () => {
 });
 
 describe('decodeSessionToken — ring session revocation', () => {
-  // methods only ever READS the ring cookie here, so a revoked session is
+  // pause only ever READS the ring cookie here, so a revoked session is
   // refused on every read rather than cleared once. Fail open: anything but a
   // well-formed {valid:false} keeps the user.
   const stale = () => Date.now() - RING_CHECK_INTERVAL_MS - 60_000;

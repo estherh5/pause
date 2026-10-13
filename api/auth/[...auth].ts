@@ -31,7 +31,7 @@ export const callbacks = {
   },
   // Stamp the ring-global sign-in claims (see lib/ring-session-check.ts). Only
   // on the sign-in branch: every ring app reads a missing `signedInAt` as 0,
-  // so without this a methods sign-in is revoked by the next ring app it
+  // so without this a pause sign-in is revoked by the next ring app it
   // visits once the account has ever reset its password.
   jwt({ token, user }) {
     if (user?.email) stampSignIn(token, Date.now());

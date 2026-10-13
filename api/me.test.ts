@@ -13,6 +13,7 @@ const handler = (await import('./me.js')).default;
 
 beforeEach(async () => { h.db = (await makeMigratedDb()) as never; h.user = null; });
 
+
 describe('GET /api/me', () => {
   it('signed out → 200 { state: "signed-out" } (never a 401: sign-in is optional)', async () => {
     const out = await callHandler(handler, { method: 'GET' });
@@ -31,5 +32,9 @@ describe('GET /api/me', () => {
   it('owner → owner', async () => {
     h.user = { email: 'hoffman.esther@gmail.com', name: 'Esther' };
     expect((await callHandler(handler, { method: 'GET' })).body).toMatchObject({ state: 'owner' });
+  });
+  it('lowercases the echoed email, like sessionEmail', async () => {
+    h.user = { email: 'Mixed@Example.com', name: 'M' };
+    expect((await callHandler(handler, { method: 'GET' })).body).toEqual({ state: 'guest', email: 'mixed@example.com' });
   });
 });

@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 /**
  * THE AUTH CALLBACKS, TESTED THROUGH THE HANDLER THAT SHIPS THEM.
  *
- * methods' admission gate is `signIn`, and it is a single `return` inside
+ * pause's admission gate is `signIn`, and it is a single `return` inside
  * an object literal that used to be buried in `authConfig` inside
  * `api/auth/[...auth].ts`, where nothing could reach it. Three mutations
  * restore pre-feature behaviour; all three were run against PRODUCTION SOURCE
@@ -26,7 +26,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
  * recording mock below. This was measured in restock, not reasoned about.
  *
  * Mutation A from the fleet brief (the jwt callback computing an admission
- * verdict and then discarding it) HAS NO ANALOGUE HERE: methods has no
+ * verdict and then discarding it) HAS NO ANALOGUE HERE: pause has no
  * admission/invite gate in this file. Its only `jwt` callback stamps the ring
  * sign-in claims (lib/ring-session-check.ts), pinned at the bottom.
  */
@@ -81,9 +81,9 @@ describe('the handler runs on the object this test imports', () => {
     // Mutation C2, which the pin above CANNOT see. A spread inside GET/POST
     // leaves `authConfig` pristine, so what the app actually runs on is the
     // argument — and the argument is therefore what gets pinned.
-    const request = new Request('https://methods.test/api/auth/session');
+    const request = new Request('https://pause.test/api/auth/session');
     await GET(request);
-    await POST(new Request('https://methods.test/api/auth/signin', { method: 'POST' }));
+    await POST(new Request('https://pause.test/api/auth/signin', { method: 'POST' }));
 
     expect(authCalls).toHaveLength(2);
     for (const call of authCalls) {
@@ -95,7 +95,7 @@ describe('the handler runs on the object this test imports', () => {
 
 describe('callbacks.signIn', () => {
   it('refuses a Google account whose email Google has not verified', async () => {
-    // Mutation B. methods maps access by email address, so an unverified
+    // Mutation B. pause maps access by email address, so an unverified
     // Google email is an unauthenticated claim to somebody else's account.
     expect(await signIn('google', { email: 'imposter@example.com', email_verified: false })).toBe(
       false,
@@ -122,7 +122,7 @@ describe('callbacks.signIn', () => {
 
 describe('callbacks.jwt — the ring sign-in stamp', () => {
   // Without these claims every ported ring app reads `signedInAt` as 0, so
-  // once the account resets its password a methods sign-in is revoked by the
+  // once the account resets its password a pause sign-in is revoked by the
   // next ring app it visits — every time. See lib/ring-session-check.ts.
   it('stamps numeric signedInAt and ringCheckedAt on sign-in', async () => {
     const before = Date.now();

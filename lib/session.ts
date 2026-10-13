@@ -7,7 +7,11 @@ function readCookie(header: string | undefined, name: string): string | undefine
   for (const part of header.split(';')) {
     const idx = part.indexOf('=');
     if (idx < 0) continue;
-    if (part.slice(0, idx).trim() === name) return decodeURIComponent(part.slice(idx + 1).trim());
+    if (part.slice(0, idx).trim() === name) try {
+        return decodeURIComponent(part.slice(idx + 1).trim());
+      } catch {
+        return undefined; // malformed escape: treat as no session, never a 500
+      }
   }
   return undefined;
 }

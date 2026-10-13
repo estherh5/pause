@@ -19,7 +19,7 @@ export async function decodeSessionToken(token: string | undefined): Promise<Ses
     const email = payload?.email;
     if (!email || typeof email !== 'string') return null;
     // A password change on the auth service ends every ring session signed in
-    // before it — see lib/ring-session-check.ts. methods only READS this
+    // before it — see lib/ring-session-check.ts. pause only READS this
     // cookie (never re-stamps or clears it), so a revoked session is refused
     // on every read. Fails open, and never throws.
     if ((await revalidateRingSession(payload, Date.now())) === null) return null;
