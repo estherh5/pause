@@ -1,4 +1,20 @@
 :root {
+  /* Pause tokens (spec 4); new CSS reads only these. Bright green is a fill
+     with black text, never text. */
+  --pause-paper: #ffffff;
+  --pause-ink: #000000;
+  --pause-muted: #595959;
+  --pause-rule: #dcdcdc;
+  --pause-drop: #b7b7b7;
+  --pause-wash: #f4f4f4;
+  --pause-green: #0edc00;
+  --pause-green-ink: #087a00;
+  --pause-red-ink: #c00000;
+  --pause-green-hover: #0db902;
+  --pause-shadow: #a2a2a2;
+  --pause-ink-hover: #333333;
+  --pause-scrim: rgb(0 0 0 / 0.25);
+
   /* Fleet menu + footer (components/fleet.css). Pause has no color tokens of
      its own, so these are its literals: white page, black ink, #dcdcdc rules.
      Black is the accent rather than the #0edc00 hover green, which is 1.7:1 on

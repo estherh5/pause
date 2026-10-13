@@ -1,0 +1,48 @@
+.pause-button {
+  min-block-size: 44px;
+  padding: 7px 16px;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 1px 1px 1px var(--pause-drop);
+  background-color: var(--pause-green);
+  color: var(--pause-ink);
+  font: 17px 'Raleway', sans-serif;
+  cursor: pointer;
+}
+.pause-button:hover { background-color: var(--pause-green-hover); }
+.pause-button:active, .pause-button:disabled { box-shadow: none; }
+.pause-button:focus-visible, .pause-quiet:focus-visible, .pause-link:focus-visible, .pause-back:focus-visible {
+  outline: 2px solid var(--pause-ink);
+  outline-offset: 3px;
+}
+.pause-quiet {
+  min-block-size: 44px;
+  padding: 7px 16px;
+  border: 1px solid var(--pause-rule);
+  border-radius: 5px;
+  background: var(--pause-paper);
+  color: var(--pause-ink);
+  font: 15px 'Raleway', sans-serif;
+  cursor: pointer;
+}
+.pause-quiet:hover { background: var(--pause-wash); }
+.pause-link { color: var(--pause-green-ink); text-decoration: underline; text-underline-offset: 2px; }
+.pause-link:hover { color: var(--pause-ink); }
+.pause-back {
+  position: fixed; top: 8px; left: 16px; z-index: 3;
+  display: inline-flex; align-items: center; min-block-size: 44px;
+  color: var(--pause-ink); font: 15px 'Raleway', sans-serif;
+}
+.pause-back:hover { color: var(--pause-ink-hover); text-decoration: underline; }
+.pause-page {
+  inline-size: 100%;
+  max-inline-size: 36rem;
+  box-sizing: border-box;
+  padding: 72px 16px 96px;
+  margin: 0 auto;
+  text-align: left;
+}
+.pause-page-title { margin: 0 0 24px; font: 40px 'Satisfy', cursive; text-align: center; }
+.pause-muted { color: var(--pause-muted); }
+.pause-error { color: var(--pause-red-ink); }
+.pause-skeleton { block-size: 18px; border-radius: 3px; background: var(--pause-wash); }

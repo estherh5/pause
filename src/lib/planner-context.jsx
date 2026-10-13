@@ -1,0 +1,39 @@
+import PropTypes from 'prop-types';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createInitialSchedule, scheduleKey } from './schedule.js';
+
+const PlannerContext = createContext(null);
+
+/** The plan on screen lives ABOVE the routes (spec D9), so /plans and /stats
+ *  never cost the person their unsaved work. */
+export function PlannerProvider({ children }) {
+  const [schedule, setSchedule] = useState(createInitialSchedule);
+  const [baseline, setBaseline] = useState(() => scheduleKey(createInitialSchedule()));
+  const [currentPlan, setCurrentPlan] = useState(null);
+
+  const loadSchedule = useCallback((next, plan) => {
+    setSchedule(next);
+    setBaseline(scheduleKey(next));
+    setCurrentPlan(plan ?? null);
+  }, []);
+  const resetSchedule = useCallback(() => loadSchedule(createInitialSchedule(), null), [loadSchedule]);
+  const markSaved = useCallback((plan) => {
+    setCurrentPlan(plan);
+    setSchedule((s) => { setBaseline(scheduleKey(s)); return s; });
+  }, []);
+
+  const value = useMemo(() => ({
+    schedule, setSchedule, currentPlan, isDirty: scheduleKey(schedule) !== baseline,
+    loadSchedule, resetSchedule, markSaved,
+  }), [schedule, currentPlan, baseline, loadSchedule, resetSchedule, markSaved]);
+  return <PlannerContext.Provider value={value}>{children}</PlannerContext.Provider>;
+}
+
+PlannerProvider.propTypes = { children: PropTypes.node };
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function usePlanner() {
+  const v = useContext(PlannerContext);
+  if (!v) throw new Error('usePlanner outside PlannerProvider');
+  return v;
+}

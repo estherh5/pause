@@ -1,14 +1,22 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
 import { FlareBoundary } from './components/FlareBoundary.jsx';
 import { FleetFooter } from './components/FleetFooter';
 import './index.css';
 
+const queryClient = new QueryClient();
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <FlareBoundary>
-      <App />
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </QueryClientProvider>
     </FlareBoundary>
   </StrictMode>,
 );
@@ -27,15 +35,14 @@ createRoot(document.getElementById('footer')).render(<FleetFooter />);
 // by the footer root above, which is deliberately outside the boundary. So this
 // and FlareBoundary are complementary, not redundant.
 //
-// Release reads VITE_COMMIT_REF for the reason given in lib/flare.js: pause is
-// on Netlify, where no Vercel variable is ever set.
+// Release reads VITE_VERCEL_GIT_COMMIT_SHA, which Vercel exposes to Vite builds under the VITE_ prefix (same as methods).
 {
   const endpoint = import.meta.env.VITE_FLARE_URL;
   const key = import.meta.env.VITE_FLARE_KEY;
   if (endpoint && key && import.meta.env.PROD === true) {
     const MAX_BUFFERED = 20;
     const FLUSH_MS = 5_000;
-    const release = import.meta.env.VITE_COMMIT_REF ?? null;
+    const release = import.meta.env.VITE_VERCEL_GIT_COMMIT_SHA ?? null;
 
     let buffer = [];
     let dropped = 0;

@@ -11,15 +11,10 @@
 // names under that exact prefix at build time — never a computed or aliased
 // access), and the production gate is Vite's own `import.meta.env.PROD`.
 //
-// ONE DELIBERATE DIFFERENCE FROM methods: the release reads VITE_COMMIT_REF,
-// not VITE_VERCEL_GIT_COMMIT_SHA. pause is hosted on Netlify, where no Vercel
-// variable is ever populated, so methods' name would leave `release` null on
-// every event forever and nothing would report the omission. Netlify's own
-// build variable is COMMIT_REF; netlify.toml maps it across the VITE_ prefix
-// boundary, because Vite inlines nothing without it.
+// pause moved to Vercel on 2026-10; the release variable is methods' own.
 const ENDPOINT = import.meta.env.VITE_FLARE_URL;
 const KEY = import.meta.env.VITE_FLARE_KEY;
-const RELEASE = import.meta.env.VITE_COMMIT_REF ?? null;
+const RELEASE = import.meta.env.VITE_VERCEL_GIT_COMMIT_SHA ?? null;
 
 const TIMEOUT_MS = 2_000;
 const MAX_CONTEXT_CHARS = 8_000;

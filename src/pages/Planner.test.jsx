@@ -1,7 +1,7 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import App from './App.jsx';
+import { renderApp } from '../test/render.jsx';
 
 vi.mock('react-chartjs-2', () => ({
   Bar: () => <div data-testid="chart" />,
@@ -13,7 +13,7 @@ vi.mock('react-chartjs-2', () => ({
 describe('App', () => {
   it('switches between day and week schedules', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderApp();
 
     await user.selectOptions(screen.getByTitle('Toggle time period'), 'week');
 
@@ -24,7 +24,7 @@ describe('App', () => {
 
   it('adds an activity and updates the remaining hours', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderApp();
 
     await user.type(screen.getByTitle('activity'), 'sleep');
     await user.type(screen.getByTitle('hours'), '8');
@@ -37,7 +37,7 @@ describe('App', () => {
 
   it('validates schedules longer than 24 hours', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderApp();
 
     await user.type(screen.getByTitle('activity'), 'sleep');
     await user.type(screen.getByTitle('hours'), '25');
@@ -50,7 +50,7 @@ describe('App', () => {
 
   it('shows calculator totals for a selected age range', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderApp();
     await user.click(screen.getByTitle('Professional activities'));
 
     fireEvent.blur(screen.getByTitle('Enter your age'), {
