@@ -44,4 +44,16 @@ export const api = {
       throw e;
     }),
   stats: (tz) => request(`/stats?tz=${enc(tz)}`),
+  // Owner: the invitation list (never carries a token), composer and row actions.
+  listInvites: () => request('/access?resource=invites'),
+  createInvite: (email, note) => request('/access?resource=invites', { method: 'POST', body: { email, note } }),
+  resendInvite: (id) => request('/access?resource=invites&action=resend', { method: 'POST', body: { id } }),
+  revokeInvite: (id) => request('/access?resource=invites&action=revoke', { method: 'POST', body: { id } }),
+  restoreInvite: (id) => request('/access?resource=invites&action=restore', { method: 'POST', body: { id } }),
+  // Feedback (api/feedback.ts): `mine` is any member's own threads, the bare list is the owner's inbox.
+  listFeedback: () => request('/feedback?mine=1'),
+  listAllFeedback: () => request('/feedback'),
+  createFeedback: (body) => request('/feedback', { method: 'POST', body }),
+  setFeedbackStatus: (id, status) => request(`/feedback/${enc(id)}`, { method: 'PATCH', body: { status } }),
+  replyFeedback: (id, body) => request(`/feedback?id=${enc(id)}&action=reply`, { method: 'POST', body: { body } }),
 };

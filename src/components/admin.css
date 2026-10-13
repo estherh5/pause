@@ -1,0 +1,90 @@
+/* Owner settings, feedback inbox and the feedback button. Pause tokens only. */
+
+.pause-section-title { margin: 0 0 8px; font-size: 22px; font-weight: normal; }
+.pause-form-gap { margin-bottom: 14px; }
+.pause-textarea { min-block-size: 96px; resize: vertical; line-height: 1.4; }
+.pause-tap { display: inline-flex; align-items: center; min-block-size: 44px; }
+.pause-settings-link { margin: 24px 0 0; }
+.pause-check { display: flex; align-items: center; gap: 10px; min-block-size: 44px; margin: 4px 0; font-size: 16px; cursor: pointer; }
+.pause-check input { inline-size: 20px; block-size: 20px; accent-color: var(--pause-ink); }
+.pause-check input:focus-visible { outline: 2px solid var(--pause-ink); outline-offset: 2px; }
+/* The dropdown trigger from select-menu.css is 3px-padded; this brings it to a 44px tap target. */
+.pause-selectbox { min-block-size: 44px; padding: 8px 10px; border-radius: 3px; font-size: 16px; }
+
+/* ---- invitations ---- */
+.invite-composer { margin: 16px 0 24px; }
+.invite-composer .pause-field-label { margin-top: 12px; }
+.invite-composer .pause-field-label:first-of-type { margin-top: 0; }
+.invite-hint { margin: 6px 0 12px; font-size: 14px; }
+.invite-composer [role='status'] p { margin: 0 0 12px; }
+.invite-list { margin: 0; padding: 0; list-style: none; }
+.invite-row { display: flex; flex-direction: column; gap: 4px; padding: 14px 0; border-top: 1px solid var(--pause-rule); }
+.invite-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.invite-email { min-inline-size: 0; overflow-wrap: anywhere; font-size: 17px; }
+.invite-pill { padding: 2px 10px; border-radius: 999px; background: var(--pause-wash); color: var(--pause-muted); font-size: 14px; }
+.invite-pill-pending { color: var(--pause-ink); }
+/* Bright green is a fill, with black text. */
+.invite-pill-accepted { background: var(--pause-green); color: var(--pause-ink); }
+.invite-pill-removed, .invite-pill-revoked { color: var(--pause-red-ink); }
+.invite-meta { margin: 0; font-size: 14px; }
+.invite-note { margin: 0; font-size: 15px; overflow-wrap: anywhere; }
+.invite-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.invite-danger.is-armed { border-color: var(--pause-red-ink); color: var(--pause-red-ink); font-weight: 700; }
+.invite-actions .pause-quiet:disabled { cursor: default; opacity: 0.7; }
+
+/* ---- form drafts: the strip above a form that says what was kept ---- */
+.draft-notice-region { inline-size: 100%; }
+.draft-notice {
+  display: flex; flex-wrap: wrap; align-items: center; column-gap: 16px; margin-bottom: 12px;
+  padding: 0 12px; background: var(--pause-wash); border-radius: 3px; color: var(--pause-ink);
+}
+.draft-notice-text { flex: 1 1 14rem; min-inline-size: 0; margin: 0; padding: 8px 0; font-size: 14px; }
+.draft-notice-action {
+  flex-shrink: 0; min-block-size: 44px; padding: 0 6px; border: 0; background: none;
+  color: var(--pause-green-ink); font: 14px 'Raleway', sans-serif; text-decoration: underline; text-underline-offset: 2px; cursor: pointer;
+}
+.draft-notice-action:hover { color: var(--pause-ink); }
+.draft-notice-action:focus-visible { outline: 2px solid var(--pause-ink); outline-offset: 2px; }
+.draft-notice-discard.is-armed { color: var(--pause-red-ink); font-weight: 700; }
+
+/* ---- the feedback button: bottom-left, opposite the "+" FAB ---- */
+.pause-feedback-fab {
+  position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 2;
+  min-block-size: 44px; border-radius: 22px; box-shadow: 1px 1px 1px var(--pause-drop);
+}
+/* Keep the fleet footer clear of the button (44px + 16px offset + 16px air). */
+@media (max-width: 640px) { :root:has(.pause-feedback-fab) { --fleet-footer-clear: 76px; } }
+
+/* ---- the feedback dialog and threads ---- */
+.pause-feedback-dialog { inline-size: min(32rem, calc(100vw - 32px)); max-block-size: calc(100dvh - 32px); overflow-y: auto; }
+.fb-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--pause-rule); }
+.fb-tab {
+  min-block-size: 44px; padding: 0 12px; border: none; border-bottom: 3px solid transparent; background: none;
+  color: var(--pause-muted); font: 16px 'Raleway', sans-serif; cursor: pointer;
+}
+.fb-tab.is-active { border-bottom-color: var(--pause-ink); color: var(--pause-ink); }
+.fb-tab:focus-visible { outline: 2px solid var(--pause-ink); outline-offset: -2px; }
+.fb-list, .fb-admin-list { margin: 0; padding: 0; list-style: none; }
+.fb-item { border-top: 1px solid var(--pause-rule); }
+.fb-item-toggle {
+  display: flex; align-items: center; gap: 10px; inline-size: 100%; min-block-size: 44px; padding: 0;
+  background: none; color: var(--pause-ink); font: 16px 'Raleway', sans-serif; text-align: left;
+}
+.fb-item-toggle:focus-visible { outline: 2px solid var(--pause-ink); outline-offset: 2px; }
+.fb-item-type { flex: 1; }
+.fb-badge { padding: 2px 10px; border-radius: 999px; background: var(--pause-wash); font-size: 14px; }
+.fb-badge.status-addressed { background: var(--pause-green); color: var(--pause-ink); }
+.fb-chevron { color: var(--pause-muted); }
+.fb-thread { display: flex; flex-direction: column; gap: 8px; margin: 8px 0 14px; }
+.fb-bubble { max-inline-size: 85%; padding: 8px 12px; border-radius: 8px; }
+.fb-bubble.user { align-self: flex-start; background: var(--pause-wash); }
+.fb-bubble.admin { align-self: flex-end; border: 1px solid var(--pause-ink); background: var(--pause-paper); }
+.fb-bubble-label { display: block; margin-bottom: 2px; color: var(--pause-muted); font-size: 13px; overflow-wrap: anywhere; }
+.fb-bubble-body { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.fb-bubble-meta { display: flex; gap: 10px; margin-top: 4px; color: var(--pause-muted); font-size: 13px; }
+.fb-email-status.failed { color: var(--pause-red-ink); }
+.fb-email-status.pretracking { font-style: italic; }
+.fb-admin-row { padding: 16px 0; border-top: 1px solid var(--pause-rule); }
+.fb-admin-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; overflow-wrap: anywhere; }
+.fb-admin-page { margin: 4px 0 0; font-size: 14px; overflow-wrap: anywhere; }
+.fb-reply-send { margin-top: 12px; }
