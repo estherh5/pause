@@ -20,7 +20,7 @@ function PlanRow({ plan, onRemoved, announce }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const confirm = useConfirm();
-  const { isDirty } = usePlanner();
+  const { isDirty, syncCurrentPlan } = usePlanner();
   const [mode, setMode] = useState('view'); // view | rename | delete
   const [draft, setDraft] = useState(plan.name);
   const [error, setError] = useState('');
@@ -47,6 +47,7 @@ function PlanRow({ plan, onRemoved, announce }) {
     setBusy(true);
     try {
       await api.updatePlan(plan.id, { name: checked.name });
+      syncCurrentPlan(plan.id, { name: checked.name });
       await queryClient.invalidateQueries({ queryKey: ['plans'] });
       setMode('view');
       setError('');
@@ -62,6 +63,7 @@ function PlanRow({ plan, onRemoved, announce }) {
     setBusy(true);
     try {
       await api.deletePlan(plan.id);
+      syncCurrentPlan(plan.id, null);
       onRemoved(plan.id);
       await queryClient.invalidateQueries({ queryKey: ['plans'] });
       await queryClient.invalidateQueries({ queryKey: ['stats'] });

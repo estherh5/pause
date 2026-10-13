@@ -12,6 +12,7 @@ function messageFor(err, name) {
   if (err instanceof ApiError) {
     if (err.code === 'duplicate-name') return `You already have a plan called "${name}".`;
     if (err.code === 'plan-limit') return 'You have 500 saved plans. Delete one to save another.';
+    if (err.status === 404) return 'This plan was deleted. Save it as a new plan.';
     if (err.status === 400 && err.code) return err.code; // the server's own validation sentence
   }
   return "The plan didn't save. Check your connection and try again.";

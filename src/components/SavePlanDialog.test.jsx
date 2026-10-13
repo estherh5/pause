@@ -64,4 +64,40 @@ describe('Save dialog', () => {
     expect(dialog.getByRole('button', { name: 'Saving…' })).toBeDisabled();
     resolve();
   });
+
+  describe('editing a saved plan', () => {
+    const openPlan = { ...summary('Week'), activities: { 0: [{ id: 0, value: 16, label: '' }, { id: 1, value: 8, label: 'sleep', color: '#ff0000' }, { id: '?', value: '', label: '' }] }, chartTypes: { 0: 'pie' } };
+    async function openSaved(user, patch) {
+      const r = renderApp({ route: '/?plan=p1', me: member, routes: {
+        '/api/plans/p1': (_p, init) => (init.method === 'PATCH' ? patch(init) : jsonResponse(openPlan)),
+        '/api/plans': (_p, init) => jsonResponse(summary(JSON.parse(init.body).name), 201),
+      } });
+      await screen.findByDisplayValue('sleep');
+      await user.click(await screen.findByRole('button', { name: 'Save' }));
+      return { ...r, dialog: within(screen.getByRole('dialog', { name: 'Save plan' })) };
+    }
+    it('Save changes PATCHes the open plan with name and plan', async () => {
+      const user = userEvent.setup();
+      const { calls, dialog } = await openSaved(user, (init) => jsonResponse(summary(JSON.parse(init.body).name)));
+      await user.click(dialog.getByRole('button', { name: 'Save changes' }));
+      expect(await screen.findByText('"Week" is in My plans.')).toBeInTheDocument();
+      const patch = calls.find((c) => c.method === 'PATCH');
+      expect(patch.path).toBe('/api/plans/p1');
+      expect(patch.body).toMatchObject({ name: 'Week', plan: { timeUnit: 'day' } });
+    });
+    it('Save as new plan POSTs instead of patching', async () => {
+      const user = userEvent.setup();
+      const { calls, dialog } = await openSaved(user, () => jsonResponse({}, 500));
+      await user.click(dialog.getByRole('button', { name: 'Save as new plan' }));
+      expect(await screen.findByText('"Week" is in My plans.')).toBeInTheDocument();
+      expect(calls.some((c) => c.method === 'PATCH')).toBe(false);
+      expect(calls.find((c) => c.path === '/api/plans' && c.method === 'POST').body).toMatchObject({ name: 'Week' });
+    });
+    it('a 404 on update says the plan was deleted, not "check your connection"', async () => {
+      const user = userEvent.setup();
+      const { dialog } = await openSaved(user, () => jsonResponse({ error: 'not-found' }, 404));
+      await user.click(dialog.getByRole('button', { name: 'Save changes' }));
+      expect(await dialog.findByRole('alert')).toHaveTextContent('This plan was deleted. Save it as a new plan.');
+    });
+  });
 });

@@ -26,10 +26,15 @@ export function PlannerProvider({ children }) {
     setSchedule((s) => { setBaseline(scheduleKey(s)); return s; });
   }, []);
 
+  // /plans renamed (patch) or deleted (null) a plan: keep the plan on screen in step.
+  const syncCurrentPlan = useCallback((id, patch) => {
+    setCurrentPlan((p) => (p && p.id === id ? (patch ? { ...p, ...patch } : null) : p));
+  }, []);
+
   const value = useMemo(() => ({
     schedule, setSchedule, currentPlan, loadedShareId, isDirty: scheduleKey(schedule) !== baseline,
-    loadSchedule, resetSchedule, markSaved,
-  }), [schedule, currentPlan, loadedShareId, baseline, loadSchedule, resetSchedule, markSaved]);
+    loadSchedule, resetSchedule, markSaved, syncCurrentPlan,
+  }), [schedule, currentPlan, loadedShareId, baseline, loadSchedule, resetSchedule, markSaved, syncCurrentPlan]);
   return <PlannerContext.Provider value={value}>{children}</PlannerContext.Provider>;
 }
 

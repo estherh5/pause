@@ -146,5 +146,54 @@ describe('/plans', () => {
     expect(await screen.findByTitle('activity')).toBeInTheDocument();
     expect(screen.queryByDisplayValue('sleep')).toBeNull();
   });
+
+  describe('the open plan stays in step with /plans', () => {
+    const openPlan = { ...row('p1', 'Week', { timeUnit: 'day' }), activities: { 0: [{ id: 0, value: 16, label: '' }, { id: 1, value: 8, label: 'sleep', color: '#ff0000' }, { id: '?', value: '', label: '' }] }, chartTypes: { 0: 'pie' } };
+    async function openThenPlans(user) {
+      let name = 'Week';
+      let deleted = false;
+      const { calls } = renderApp({ route: '/?plan=p1', me: member, routes: {
+        '/api/plans/p1': (_p, init) => {
+          if (init.method === 'PATCH') { name = JSON.parse(init.body).name; return jsonResponse(row('p1', name)); }
+          if (init.method === 'DELETE') { deleted = true; return new Response(null, { status: 204 }); }
+          return jsonResponse(openPlan);
+        },
+        '/api/plans': () => jsonResponse(deleted ? [] : [row('p1', name)]),
+      } });
+      await screen.findByDisplayValue('sleep');
+      await user.click(screen.getByRole('link', { name: 'My plans' }));
+      return calls;
+    }
+    it('renaming the open plan: the planner shows the new name and the next save sends it', async () => {
+      const user = userEvent.setup();
+      const calls = await openThenPlans(user);
+      await user.click(await screen.findByRole('button', { name: 'Rename Week' }));
+      const field = screen.getByRole('textbox', { name: 'Plan name' });
+      await user.clear(field);
+      await user.type(field, 'Renamed{Enter}');
+      await screen.findByRole('button', { name: 'Rename Renamed' });
+      await user.click(screen.getByRole('link', { name: '‹ Pause' }));
+      expect(await screen.findByText('Renamed')).toBeInTheDocument();
+      await user.click(await screen.findByRole('button', { name: 'Save' }));
+      const dialog = within(screen.getByRole('dialog', { name: 'Save plan' }));
+      expect(dialog.getByRole('textbox', { name: 'Name' })).toHaveValue('Renamed');
+      await user.click(dialog.getByRole('button', { name: 'Save changes' }));
+      await waitFor(() => expect(calls.filter((c) => c.method === 'PATCH').at(-1).body.name).toBe('Renamed'));
+      expect(calls.filter((c) => c.method === 'PATCH')).toHaveLength(2);
+    });
+    it('deleting the open plan: the work stays on screen and Save offers a fresh save', async () => {
+      const user = userEvent.setup();
+      await openThenPlans(user);
+      await user.click(await screen.findByRole('button', { name: 'Delete Week' }));
+      await user.click(screen.getByRole('button', { name: 'Delete' }));
+      await screen.findByText('No saved plans yet.');
+      await user.click(screen.getByRole('link', { name: '‹ Pause' }));
+      expect(await screen.findByDisplayValue('sleep')).toBeInTheDocument();
+      await user.click(await screen.findByRole('button', { name: 'Save' }));
+      const dialog = within(screen.getByRole('dialog', { name: 'Save plan' }));
+      expect(dialog.queryByRole('button', { name: 'Save changes' })).toBeNull();
+      expect(dialog.queryByRole('button', { name: 'Save as new plan' })).toBeNull();
+    });
+  });
 });
 
