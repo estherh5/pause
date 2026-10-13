@@ -8,7 +8,7 @@
     { "source": "/api/pause/activities/:id", "destination": "/api/pause/activities?id=:id" },
     { "source": "/api/plans/:id", "destination": "/api/plans?id=:id" },
     { "source": "/api/feedback/:id", "destination": "/api/feedback?id=:id" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/((?!api/|@)[^.]*)", "destination": "/index.html" }
   ],
   "git": { "deploymentEnabled": { "flare/*": false, "dependabot/**": false } },
   "headers": [
