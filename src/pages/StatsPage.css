@@ -3,7 +3,7 @@
 .stat-bars { margin: 0; padding: 0; list-style: none; }
 .stat-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) auto;
   gap: 10px;
   align-items: center;
   padding: 6px 0;

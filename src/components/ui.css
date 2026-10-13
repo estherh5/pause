@@ -1,6 +1,8 @@
 .pause-button {
+  box-sizing: border-box; /* an <a> is content-box: 44px + padding + border read 60px */
+  display: inline-flex; align-items: center; justify-content: center;
   min-block-size: 44px;
-  padding: 7px 16px;
+  padding: 0 16px;
   border: none;
   border-radius: 5px;
   box-shadow: 1px 1px 1px var(--pause-drop);
@@ -16,8 +18,10 @@
   outline-offset: 3px;
 }
 .pause-quiet {
+  box-sizing: border-box;
+  display: inline-flex; align-items: center; justify-content: center;
   min-block-size: 44px;
-  padding: 7px 16px;
+  padding: 0 16px;
   border: 1px solid var(--pause-rule);
   border-radius: 5px;
   background: var(--pause-paper);
@@ -38,7 +42,7 @@
   inline-size: 100%;
   max-inline-size: 36rem;
   box-sizing: border-box;
-  padding: 72px 16px 96px;
+  padding: 72px 16px 24px; /* the footer's own 32px top padding and --fleet-footer-clear carry the rest */
   margin: 0 auto;
   text-align: left;
 }

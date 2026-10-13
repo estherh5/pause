@@ -22,4 +22,5 @@
 .plan-open:focus-visible, .pause-cta:focus-visible { outline: 2px solid var(--pause-ink); outline-offset: 3px; }
 .plan-confirm, .plan-rename { grid-column: 1 / -1; }
 .plan-delete { color: var(--pause-red-ink); }
-@media (max-width: 480px) { .plan-row { grid-template-columns: minmax(0, 1fr); } .plan-actions { justify-content: flex-start; } }
+/* Actions stay in the right column; only a phone too narrow for name and four controls stacks them. */
+@media (max-width: 359px) { .plan-row { grid-template-columns: minmax(0, 1fr); } .plan-actions { justify-content: flex-start; } }

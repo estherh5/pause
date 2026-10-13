@@ -10,6 +10,7 @@
   font-family: 'Raleway', sans-serif;
   text-align: left;
 }
+.pause-dialog input, .pause-field { text-align: left; } /* #root centers text; inputs inherit it */
 .pause-dialog::backdrop { background: var(--pause-scrim); }
 .pause-dialog-title { margin: 0 0 16px; padding-bottom: 10px; border-bottom: 1px solid var(--pause-rule); font-size: 20px; font-weight: normal; }
 .pause-dialog-body { margin: 0; font-size: 16px; line-height: 1.5; }

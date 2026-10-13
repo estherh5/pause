@@ -41,7 +41,7 @@
   font-weight: normal;
 }
 
-.pause-time-unit {
+#subtitle .pause-time-unit {
   display: inline-flex;
   min-block-size: 44px;
   padding: 3px 8px;
@@ -51,6 +51,7 @@
 
 #subtitle .selectmenu {
   display: inline-block;
+  vertical-align: baseline;
 }
 
 #month-toggle {
