@@ -1,0 +1,26 @@
+/* Dropdown (replaces native <select>). Ported from methods, on pause's tokens. */
+.selectmenu { position: relative; min-width: 0; }
+.selectbox {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  font-family: 'Raleway', sans-serif; font-size: 14px; text-align: left;
+  padding: 3px 8px; border: 1px solid var(--pause-rule); border-radius: 0;
+  background: none; color: var(--pause-ink); cursor: pointer;
+}
+.selectbox:disabled { cursor: default; opacity: 0.6; }
+.selectbox:focus-visible { outline: 2px solid var(--pause-ink); outline-offset: 2px; }
+.selectbox-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.selectbox-caret { flex: none; font-size: 13px; line-height: 1; color: var(--pause-muted); }
+/* fixed, not absolute: a scrolling ancestor would clip an absolutely-positioned popup. */
+.selectmenu-popup {
+  position: fixed; z-index: 60; margin: 0; padding: 4px; list-style: none;
+  max-height: 260px; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  font-family: 'Raleway', sans-serif; font-size: 14px; color: var(--pause-ink);
+  background: var(--pause-paper); border: 1px solid var(--pause-rule); border-radius: 3px;
+  box-shadow: 0 4px 12px var(--pause-scrim);
+}
+.selectmenu-popup li {
+  display: flex; align-items: center; min-height: 44px; /* touch target */
+  padding: 6px 10px; border-radius: 3px; cursor: pointer;
+}
+.selectmenu-popup li.is-active { background: var(--pause-wash); }
+.selectmenu-popup li[aria-selected="true"] { font-weight: 700; }

@@ -8,6 +8,7 @@ import {
 import { API_BASE } from '../lib/api.js';
 import { usePlanner } from '../lib/planner-context.jsx';
 import { shareToSchedule } from '../lib/schedule.js';
+import { SelectMenu } from '../components/SelectMenu';
 import Calculator from '../Calculator/Calculator.jsx';
 import DayData from '../DayData/DayData.jsx';
 import Modal from '../Modal/Modal.jsx';
@@ -201,16 +202,20 @@ function Planner() {
         </h1>
         <h2 id="subtitle">
           How do you want to spend your&nbsp;
-          <select
+          <SelectMenu
             id="select-time-unit"
-            title="Toggle time period"
+            className="selectbox pause-time-unit"
+            ariaLabel="Toggle time period"
             value={schedule.timeUnit}
-            onChange={setTimeUnit}
-          >
-            <option value="day">day</option>
-            <option value="week">week</option>
-            <option value="month">month</option>
-          </select>
+            placeholder="day"
+            options={[
+              { value: 'day', label: 'day' },
+              { value: 'week', label: 'week' },
+              { value: 'month', label: 'month' },
+            ]}
+            onChange={(value) => setTimeUnit({ target: { value } })}
+            disabled={controlsDisabled}
+          />
           ?
         </h2>
         {schedule.timeUnit === 'month' && (

@@ -18,11 +18,21 @@ describe('App', () => {
     const user = userEvent.setup();
     renderApp();
 
-    await user.selectOptions(screen.getByTitle('Toggle time period'), 'week');
+    await user.click(screen.getByRole('combobox', { name: 'Toggle time period' }));
+    await user.click(screen.getByRole('option', { name: 'week' }));
 
     expect(screen.getByText('Sunday')).toBeInTheDocument();
     expect(screen.getByText('Saturday')).toBeInTheDocument();
     expect(screen.getAllByTestId('chart')).toHaveLength(7);
+  });
+
+  it('the time unit control is keyboard-operable', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    const box = screen.getByRole('combobox', { name: 'Toggle time period' });
+    box.focus();
+    await user.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}{Enter}');
+    expect(await screen.findByRole('button', { name: 'Next month' })).toBeInTheDocument();
   });
 
   it('adds an activity and updates the remaining hours', async () => {
@@ -103,10 +113,11 @@ describe('Planner share loading across remounts', () => {
     window.history.pushState({}, '', '/?activities=abc');
     render(<Harness />);
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
-    await user.selectOptions(screen.getByTitle('Toggle time period'), 'week');
+    await user.click(screen.getByRole('combobox', { name: 'Toggle time period' }));
+    await user.click(screen.getByRole('option', { name: 'week' }));
     await user.click(screen.getByText('toggle'));
     await user.click(screen.getByText('toggle'));
-    expect(screen.getByTitle('Toggle time period')).toHaveValue('week');
+    expect(screen.getByRole('combobox', { name: 'Toggle time period' })).toHaveTextContent('week');
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 

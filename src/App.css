@@ -41,16 +41,16 @@
   font-weight: normal;
 }
 
-select {
-  padding: 3px;
-  border-color: #dcdcdc;
-  border-style: solid;
-  border-width: 1px;
-  background: none;
-  font-family: 'Raleway', sans-serif;
-  font-size: 14px;
+.pause-time-unit {
+  display: inline-flex;
+  min-block-size: 44px;
+  padding: 3px 8px;
+  vertical-align: baseline;
   text-align: center;
-  cursor: pointer;
+}
+
+#subtitle .selectmenu {
+  display: inline-block;
 }
 
 #month-toggle {
