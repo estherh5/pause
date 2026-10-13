@@ -24,7 +24,6 @@
   box-shadow: 1px 1px 1px #b7b7b7;
   background-color: #000000;
   color: #ffffff;
-  transition: none;
 }
 
 .fleet-trigger.pause-fleet-trigger:hover {
@@ -33,7 +32,6 @@
 
 .fleet-trigger.pause-fleet-trigger:active {
   box-shadow: none;
-  transform: none;
 }
 
 .fleet-trigger.pause-fleet-trigger:focus-visible {
