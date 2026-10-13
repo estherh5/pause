@@ -1,5 +1,6 @@
 import { Suspense, useEffect } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import { ConfirmProvider } from './components/ConfirmDialog.jsx';
 import Header from './Header/Header.jsx';
 import Planner from './pages/Planner.jsx';
 import { PlannerProvider } from './lib/planner-context.jsx';
@@ -15,6 +16,7 @@ function App() {
 
   return (
     <PlannerProvider>
+      <ConfirmProvider>
       <div id="main-container">
         <Header me={me} />
         <Suspense fallback={null}>
@@ -24,6 +26,7 @@ function App() {
           </Routes>
         </Suspense>
       </div>
+      </ConfirmProvider>
     </PlannerProvider>
   );
 }

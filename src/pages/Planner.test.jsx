@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MemoryRouter } from 'react-router-dom';
 import { PlannerProvider } from '../lib/planner-context.jsx';
 import { jsonResponse, renderApp } from '../test/render.jsx';
 import Planner from './Planner.jsx';
@@ -102,7 +104,7 @@ describe('Planner share loading across remounts', () => {
   it('loads the shared plan from the URL id', async () => {
     const fetchMock = setup();
     window.history.pushState({}, '', '/?activities=abc');
-    render(<Harness />);
+    render(<QueryClientProvider client={new QueryClient()}><MemoryRouter><Harness /></MemoryRouter></QueryClientProvider>);
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     expect(fetchMock.mock.calls[0][0]).toBe('/api/pause/activities/abc');
   });
@@ -111,7 +113,7 @@ describe('Planner share loading across remounts', () => {
     const fetchMock = setup();
     const user = userEvent.setup();
     window.history.pushState({}, '', '/?activities=abc');
-    render(<Harness />);
+    render(<QueryClientProvider client={new QueryClient()}><MemoryRouter><Harness /></MemoryRouter></QueryClientProvider>);
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     await user.click(screen.getByRole('combobox', { name: 'Toggle time period' }));
     await user.click(screen.getByRole('option', { name: 'week' }));
@@ -125,7 +127,7 @@ describe('Planner share loading across remounts', () => {
     const fetchMock = setup();
     const user = userEvent.setup();
     window.history.pushState({}, '', '/?activities=abc');
-    render(<Harness />);
+    render(<QueryClientProvider client={new QueryClient()}><MemoryRouter><Harness /></MemoryRouter></QueryClientProvider>);
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     await user.click(screen.getByText('toggle'));
     window.history.pushState({}, '', '/?activities=xyz');

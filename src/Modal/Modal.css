@@ -1,6 +1,6 @@
 .modal {
   position: fixed;
-  height: 200px;
+  min-height: 200px;
   width: 80%;
   max-width: 500px;
   border-radius: 3px;
@@ -39,11 +39,11 @@
 }
 
 .success {
-  color: #0adc00;
+  color: var(--pause-green-ink);
 }
 
 .fail {
-  color: #ff0000;
+  color: var(--pause-red-ink);
 }
 
 .modal-body {
@@ -96,4 +96,10 @@
 
 .link-container button:hover {
   text-shadow: 0.2px 0.2px 0px #000000;
+}
+
+.modal-note {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--pause-muted);
 }

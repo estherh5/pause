@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { useCallback, useEffect, useState } from 'react';
 import {
   MONTHS,
@@ -5,23 +6,36 @@ import {
   createPeriodState,
   getDaysInMonth,
 } from '../activities.js';
-import { API_BASE } from '../lib/api.js';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { API_BASE, api, ApiError } from '../lib/api.js';
+import { isMember } from '../lib/queries.js';
+import SavePlanDialog from '../components/SavePlanDialog.jsx';
 import { usePlanner } from '../lib/planner-context.jsx';
-import { shareToSchedule } from '../lib/schedule.js';
+import { planToSchedule, shareToSchedule } from '../lib/schedule.js';
 import { SelectMenu } from '../components/SelectMenu';
 import Calculator from '../Calculator/Calculator.jsx';
 import DayData from '../DayData/DayData.jsx';
 import Modal from '../Modal/Modal.jsx';
 import StarterButtons from '../StarterButtons/StarterButtons.jsx';
 
-// Task 13 adds the `me` prop (save UI); until then the planner ignores it.
-function Planner() {
-  const { schedule, setSchedule, loadSchedule, loadedShareId } = usePlanner();
+function Planner({ me = null }) {
+  const { schedule, setSchedule, loadSchedule, loadedShareId, currentPlan, isDirty } = usePlanner();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [saveOpen, setSaveOpen] = useState(false);
+  // Counts openings so each one remounts the dialog with fresh name/error state.
+  const [saveKey, setSaveKey] = useState(0);
+  const planId = searchParams.get('plan');
+  const member = isMember(me);
+  // True until the fetch settles: settling navigates away, which clears ?plan=.
+  const opening = Boolean(planId && member);
   const [modal, setModal] = useState({
     display: false,
     status: null,
     message: null,
     link: null,
+    title: null,
+    note: null,
   });
   const [isSaving, setIsSaving] = useState(false);
   const apiUrl = API_BASE;
@@ -32,8 +46,29 @@ function Planner() {
       status: 'fail',
       message,
       link: null,
+      title: null,
+      note: null,
     });
   }, []);
+
+  useEffect(() => {
+    if (!planId || !member) return undefined;
+    let live = true;
+    api.getPlan(planId)
+      .then((p) => {
+        if (!live) return;
+        loadSchedule(planToSchedule(p), { id: p.id, name: p.name, shareId: p.shareId });
+        navigate('/', { replace: true });
+      })
+      .catch((err) => {
+        if (!live) return;
+        showError(err instanceof ApiError && err.status === 404
+          ? "That plan isn't in your saved plans."
+          : 'Your plan could not be loaded. Try again soon.');
+        navigate('/', { replace: true });
+      });
+    return () => { live = false; };
+  }, [planId, member, loadSchedule, navigate, showError]);
 
   useEffect(() => {
     const dataId = new URLSearchParams(window.location.search).get('activities');
@@ -176,12 +211,25 @@ function Planner() {
         status: 'success',
         message: null,
         link: `${window.location.origin}/?activities=${dataId}`,
+        title: null,
+        note: me?.state === 'signed-out'
+          ? <><a className="pause-link" href="/signin">Sign in</a> to keep plans by name.</>
+          : null,
       });
     } catch {
       showError('Your activities could not be saved. Try again soon.');
     } finally {
       document.body.style.cursor = '';
       setIsSaving(false);
+    }
+  }
+
+  function onSave() {
+    if (member) {
+      setSaveKey((k) => k + 1);
+      setSaveOpen(true);
+    } else {
+      postData(); // the anonymous path, unchanged
     }
   }
 
@@ -194,6 +242,8 @@ function Planner() {
         status={modal.status}
         message={modal.message}
         link={modal.link}
+        title={modal.title}
+        note={modal.note}
         onCloseModal={() => setModal((current) => ({ ...current, display: false }))}
       />
       <div id="app-container">
@@ -239,6 +289,13 @@ function Planner() {
             </button>
           </div>
         )}
+        {opening && <p className="pause-muted" role="status">Opening plan…</p>}
+        {currentPlan && (
+          <p className="pause-plan-name">
+            <span>{currentPlan.name}</span>
+            {currentPlan.id && isDirty && <span className="pause-muted"> · unsaved changes</span>}
+          </p>
+        )}
         <div id="day-data-container">
           {Object.keys(schedule.activities).map((id) => (
             <DayData
@@ -263,15 +320,37 @@ function Planner() {
           <button
             id="save"
             disabled={controlsDisabled}
-            onClick={postData}
+            onClick={onSave}
           >
             Save
           </button>
+          {member && <a className="pause-quiet pause-my-plans" href="/plans">My plans</a>}
+          {me?.state === 'guest' && (
+            <p className="pause-muted pause-guest-note">{`Saved plans are by invitation. ${me.email} doesn't have one.`}</p>
+          )}
         </div>
+        <SavePlanDialog
+          key={saveKey}
+          open={saveOpen}
+          onClose={() => setSaveOpen(false)}
+          onSaved={(saved) => {
+            setSaveOpen(false);
+            setModal({
+              display: true,
+              status: 'success',
+              title: 'Saved',
+              message: `"${saved.name}" is in My plans.`,
+              link: `${window.location.origin}/?activities=${saved.shareId}`,
+              note: null,
+            });
+          }}
+        />
         <Calculator activities={schedule.activities} />
       </div>
     </>
   );
 }
+
+Planner.propTypes = { me: PropTypes.shape({ state: PropTypes.string, email: PropTypes.string }) };
 
 export default Planner;

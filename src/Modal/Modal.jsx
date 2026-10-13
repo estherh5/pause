@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import './Modal.css';
 
-function Modal({ display, status, message, link, onCloseModal }) {
+function Modal({ display, status, message, link, title, note, onCloseModal }) {
   const modalRef = useRef(null);
 
   useEffect(() => {
@@ -54,7 +54,7 @@ function Modal({ display, status, message, link, onCloseModal }) {
         id="modal-title"
         className={`modal-header ${status === 'fail' ? 'fail' : 'success'}`}
       >
-        {status === 'fail' ? 'Error' : 'Saved'}
+        {title || (status === 'fail' ? 'Error' : 'Saved')}
       </div>
       <div className="modal-body">
         {message}
@@ -68,6 +68,7 @@ function Modal({ display, status, message, link, onCloseModal }) {
             </button>
           </div>
         )}
+        {note && <p className="modal-note">{note}</p>}
       </div>
     </div>
   );
@@ -80,5 +81,7 @@ Modal.propTypes = {
   status: PropTypes.oneOf(['loading', 'success', 'fail']),
   message: PropTypes.string,
   link: PropTypes.string,
+  title: PropTypes.string,
+  note: PropTypes.node,
   onCloseModal: PropTypes.func.isRequired,
 };

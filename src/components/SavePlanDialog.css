@@ -1,0 +1,22 @@
+.pause-dialog {
+  inline-size: min(28rem, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 16px 20px 20px;
+  border: none;
+  border-radius: 3px;
+  box-shadow: 0 0 3px var(--pause-shadow);
+  background: var(--pause-paper);
+  color: var(--pause-ink);
+  font-family: 'Raleway', sans-serif;
+  text-align: left;
+}
+.pause-dialog::backdrop { background: var(--pause-scrim); }
+.pause-dialog-title { margin: 0 0 16px; padding-bottom: 10px; border-bottom: 1px solid var(--pause-rule); font-size: 20px; font-weight: normal; }
+.pause-dialog-body { margin: 0; font-size: 16px; line-height: 1.5; }
+.pause-field-label { display: block; margin-bottom: 6px; font-size: 15px; }
+.pause-field { inline-size: 100%; box-sizing: border-box; min-block-size: 44px; padding: 8px 10px; border: 1px solid var(--pause-rule); border-radius: 3px; font: 17px 'Raleway', sans-serif; color: var(--pause-ink); background: var(--pause-paper); }
+.pause-field:focus-visible { outline: 2px solid var(--pause-ink); outline-offset: 1px; }
+.pause-field[aria-invalid='true'] { border-color: var(--pause-red-ink); }
+.pause-field-error { margin: 6px 0 0; font-size: 15px; }
+.pause-dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.pause-dialog-actions button:disabled { cursor: default; opacity: 0.7; }
