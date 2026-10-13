@@ -1,0 +1,17 @@
+.stat-section { margin-block-end: 32px; }
+.stat-section h2 { margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--pause-rule); font-size: 20px; font-weight: normal; }
+.stat-bars { margin: 0; padding: 0; list-style: none; }
+.stat-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 0;
+}
+.stat-label { overflow-wrap: anywhere; }
+.stat-track { display: block; block-size: 12px; border-radius: 2px; background: var(--pause-wash); }
+.stat-fill { display: block; block-size: 100%; border-radius: 2px; background: var(--pause-green); }
+.stat-value { min-inline-size: 3.5em; text-align: right; font-variant-numeric: tabular-nums; }
+.stat-most { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0; }
+.stat-most-label { font: 32px 'Satisfy', cursive; overflow-wrap: anywhere; }
+.stat-skeleton { block-size: 64px; margin-block-end: 16px; }

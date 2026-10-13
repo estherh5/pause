@@ -11,6 +11,7 @@ import './App.css';
 import './components/ui.css';
 
 const PlansPage = lazy(() => import('./pages/PlansPage.jsx'));
+const StatsPage = lazy(() => import('./pages/StatsPage.jsx'));
 
 function App() {
   const { data: me = null } = useMe();
@@ -26,6 +27,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Planner me={me} />} />
             <Route path="/plans" element={<PlansPage me={me} />} />
+            <Route path="/stats" element={<StatsPage me={me} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
