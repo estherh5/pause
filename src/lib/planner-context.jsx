@@ -10,11 +10,15 @@ export function PlannerProvider({ children }) {
   const [schedule, setSchedule] = useState(createInitialSchedule);
   const [baseline, setBaseline] = useState(() => scheduleKey(createInitialSchedule()));
   const [currentPlan, setCurrentPlan] = useState(null);
+  // The share id the schedule was last loaded from, so a remounted planner
+  // (route change and back) does not refetch over the person's edits.
+  const [loadedShareId, setLoadedShareId] = useState(null);
 
-  const loadSchedule = useCallback((next, plan) => {
+  const loadSchedule = useCallback((next, plan, shareId = null) => {
     setSchedule(next);
     setBaseline(scheduleKey(next));
     setCurrentPlan(plan ?? null);
+    setLoadedShareId(shareId);
   }, []);
   const resetSchedule = useCallback(() => loadSchedule(createInitialSchedule(), null), [loadSchedule]);
   const markSaved = useCallback((plan) => {
@@ -23,9 +27,9 @@ export function PlannerProvider({ children }) {
   }, []);
 
   const value = useMemo(() => ({
-    schedule, setSchedule, currentPlan, isDirty: scheduleKey(schedule) !== baseline,
+    schedule, setSchedule, currentPlan, loadedShareId, isDirty: scheduleKey(schedule) !== baseline,
     loadSchedule, resetSchedule, markSaved,
-  }), [schedule, currentPlan, baseline, loadSchedule, resetSchedule, markSaved]);
+  }), [schedule, currentPlan, loadedShareId, baseline, loadSchedule, resetSchedule, markSaved]);
   return <PlannerContext.Provider value={value}>{children}</PlannerContext.Provider>;
 }
 

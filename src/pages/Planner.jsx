@@ -15,7 +15,7 @@ import StarterButtons from '../StarterButtons/StarterButtons.jsx';
 
 // Task 13 adds the `me` prop (save UI); until then the planner ignores it.
 function Planner() {
-  const { schedule, setSchedule, loadSchedule } = usePlanner();
+  const { schedule, setSchedule, loadSchedule, loadedShareId } = usePlanner();
   const [modal, setModal] = useState({
     display: false,
     status: null,
@@ -42,6 +42,9 @@ function Planner() {
       return undefined;
     }
 
+    // Already on screen (remount after a route change): keep the edits.
+    if (dataId === loadedShareId) return undefined;
+
     const controller = new AbortController();
 
     async function loadActivities() {
@@ -59,6 +62,7 @@ function Planner() {
         loadSchedule(
           shareToSchedule(data),
           data.name ? { id: null, name: data.name, shareId: dataId } : null,
+          dataId,
         );
       } catch (error) {
         if (error.name !== 'AbortError') {
@@ -69,7 +73,7 @@ function Planner() {
 
     loadActivities();
     return () => controller.abort();
-  }, [apiUrl, showError, loadSchedule]);
+  }, [apiUrl, showError, loadSchedule, loadedShareId]);
 
   function setTimeUnit(event) {
     const timeUnit = event.target.value;

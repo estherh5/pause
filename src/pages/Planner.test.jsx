@@ -1,7 +1,10 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { useState } from 'react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
-import { renderApp } from '../test/render.jsx';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { PlannerProvider } from '../lib/planner-context.jsx';
+import { jsonResponse, renderApp } from '../test/render.jsx';
+import Planner from './Planner.jsx';
 
 vi.mock('react-chartjs-2', () => ({
   Bar: () => <div data-testid="chart" />,
@@ -62,5 +65,61 @@ describe('App', () => {
 
     const sleepRow = screen.getByText('sleep').closest('tr');
     expect(sleepRow).toHaveTextContent('2,920 hours on sleep');
+  });
+});
+
+describe('Planner share loading across remounts', () => {
+  const share = (name) => ({
+    activities: { 0: [{ id: 0, value: 24, label: '', color: '#DCDCDC' }, { id: '?', value: '', label: '' }] },
+    chart_types: { 0: 'pie' }, time_unit: 'day', month: null, year: null, name,
+  });
+  function Harness() {
+    const [shown, setShown] = useState(true);
+    return (
+      <PlannerProvider>
+        <button onClick={() => setShown((v) => !v)}>toggle</button>
+        {shown && <Planner />}
+      </PlannerProvider>
+    );
+  }
+  function setup() {
+    const fetchMock = vi.fn(async (url) => jsonResponse(share(String(url).split('/').pop())));
+    vi.stubGlobal('fetch', fetchMock);
+    return fetchMock;
+  }
+  afterEach(() => window.history.pushState({}, '', '/'));
+
+  it('loads the shared plan from the URL id', async () => {
+    const fetchMock = setup();
+    window.history.pushState({}, '', '/?activities=abc');
+    render(<Harness />);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/pause/activities/abc');
+  });
+
+  it('does not refetch over edits when remounted with the same id', async () => {
+    const fetchMock = setup();
+    const user = userEvent.setup();
+    window.history.pushState({}, '', '/?activities=abc');
+    render(<Harness />);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    await user.selectOptions(screen.getByTitle('Toggle time period'), 'week');
+    await user.click(screen.getByText('toggle'));
+    await user.click(screen.getByText('toggle'));
+    expect(screen.getByTitle('Toggle time period')).toHaveValue('week');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads again when the URL carries a different id', async () => {
+    const fetchMock = setup();
+    const user = userEvent.setup();
+    window.history.pushState({}, '', '/?activities=abc');
+    render(<Harness />);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    await user.click(screen.getByText('toggle'));
+    window.history.pushState({}, '', '/?activities=xyz');
+    await user.click(screen.getByText('toggle'));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(fetchMock.mock.calls[1][0]).toBe('/api/pause/activities/xyz');
   });
 });
