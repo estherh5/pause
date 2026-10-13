@@ -14,7 +14,7 @@ export default [
   reactHooks.configs.flat['recommended-latest'],
   reactRefresh.configs.vite,
   {
-    files: ['**/*.{js,jsx}'],
+    files: ['**/*.{js,jsx,mjs}'],
     languageOptions: {
       ecmaVersion: 'latest',
       globals: {
