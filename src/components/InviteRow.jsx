@@ -14,7 +14,7 @@ const ARM_MIN_MS = 350;
  *  bites on the person's next request. If that changes, this sentence must too. */
 const REMOVE_COPY = 'They lose saved plans right away. Their plans stay, and Restore brings them back.';
 
-const STATUS_LABEL = { pending: 'Pending', accepted: 'Accepted', expired: 'Expired', revoked: 'Revoked' };
+const STATUS_LABEL = { pending: 'Invited', accepted: 'Accepted', expired: 'Expired', revoked: 'Revoked' };
 const when = (ms) => new Date(ms).toLocaleDateString();
 
 /**

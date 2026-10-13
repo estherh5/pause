@@ -31,7 +31,7 @@ describe('InviteComposer', () => {
     const { calls } = mount();
     await user.type(screen.getByLabelText('Email'), 'new@example.com');
     await user.type(screen.getByLabelText(/Note/), 'Welcome');
-    await user.click(screen.getByRole('button', { name: 'Send invitation' }));
+    await user.click(screen.getByRole('button', { name: 'Send invite' }));
     expect(await screen.findByText('Invitation sent to new@example.com.')).toBeInTheDocument();
     const post = calls.find((c) => c.method === 'POST');
     expect(post.path).toBe('/api/access?resource=invites');
@@ -46,7 +46,7 @@ describe('InviteComposer', () => {
     setRespond(() => jsonResponse({ error: 'Enter a valid email address.' }, 400));
     await user.type(screen.getByLabelText('Email'), 'nope');
     await user.type(screen.getByLabelText(/Note/), 'keep me');
-    await user.click(screen.getByRole('button', { name: 'Send invitation' }));
+    await user.click(screen.getByRole('button', { name: 'Send invite' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Enter a valid email address.');
     expect(screen.getByLabelText(/Note/)).toHaveValue('keep me');
   });
@@ -71,7 +71,7 @@ describe('Settings invite list', () => {
     expect(JSON.stringify(list)).not.toContain('token');
     renderApp({ route: '/settings', me: owner, routes: { '/api/access': () => jsonResponse(list) } });
     const pending = (await screen.findByText('pending@example.com')).closest('li');
-    expect(within(pending).getByText('Pending')).toBeInTheDocument();
+    expect(within(pending).getByText('Invited')).toBeInTheDocument();
     expect(within(pending).getByRole('button', { name: 'Resend' })).toBeInTheDocument();
     expect(within(pending).getByRole('button', { name: 'Revoke' })).toBeInTheDocument();
     const accepted = screen.getByText('in@example.com').closest('li');

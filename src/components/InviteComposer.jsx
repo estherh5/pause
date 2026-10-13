@@ -76,7 +76,7 @@ export default function InviteComposer() {
       <div role="status">{result?.ok && <p>{result.text}</p>}</div>
       {result && !result.ok && <p role="alert" className="pause-error">{result.text}</p>}
       <button type="submit" className="pause-button" disabled={pending}>
-        {pending ? 'Sending…' : 'Send invitation'}
+        {pending ? 'Sending…' : 'Send invite'}
       </button>
     </form>
   );

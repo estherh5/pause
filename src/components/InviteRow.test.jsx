@@ -25,7 +25,7 @@ describe('InviteRow', () => {
   it('pending: Resend and a two-tap Revoke', async () => {
     const user = userEvent.setup();
     const { calls } = mount(inv());
-    expect(screen.getByText('Pending')).toBeInTheDocument();
+    expect(screen.getByText('Invited')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Remove' })).toBeNull();
     await user.click(screen.getByRole('button', { name: 'Revoke' }));
     expect(calls).toHaveLength(0);
