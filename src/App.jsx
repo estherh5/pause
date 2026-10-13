@@ -12,6 +12,9 @@ import './components/ui.css';
 
 const PlansPage = lazy(() => import('./pages/PlansPage.jsx'));
 const StatsPage = lazy(() => import('./pages/StatsPage.jsx'));
+const SignInPage = lazy(() => import('./pages/SignInPage.jsx'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage.jsx'));
+const InvitePage = lazy(() => import('./pages/InvitePage.jsx'));
 
 function App() {
   const { data: me = null } = useMe();
@@ -28,6 +31,9 @@ function App() {
             <Route path="/" element={<Planner me={me} />} />
             <Route path="/plans" element={<PlansPage me={me} />} />
             <Route path="/stats" element={<StatsPage me={me} />} />
+            <Route path="/signin" element={<SignInPage me={me} />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/invite/:token" element={<InvitePage me={me} />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
