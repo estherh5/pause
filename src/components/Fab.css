@@ -1,0 +1,20 @@
+.pause-fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 2;
+  min-block-size: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 22px;
+  box-shadow: 1px 1px 1px var(--pause-drop);
+  background: var(--pause-ink);
+  color: var(--pause-paper);
+  font: 17px 'Raleway', sans-serif;
+  cursor: pointer;
+}
+.pause-fab:hover { background: var(--pause-ink-hover); }
+.pause-fab:active { box-shadow: none; }
+.pause-fab:focus-visible { outline: 2px solid var(--pause-ink); outline-offset: 3px; }
+/* Keep the fleet footer clear of the button (44px + 16px offset + 16px air). */
+@media (max-width: 640px) { :root:has(.pause-fab) { --fleet-footer-clear: 76px; } }
