@@ -75,6 +75,8 @@ function PlanRow({ plan, onRemoved, announce }) {
 
   async function open(e) {
     if (!isDirty) return; // plain navigation to /?plan=<id>
+    // A new tab or window leaves this planner untouched, so let the browser have it.
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
     if (await confirm({ title: `Open "${plan.name}"?`, body: "The plan on screen has changes that aren't saved.", confirmLabel: 'Open', cancelLabel: 'Keep editing' })) {
       navigate(`/?plan=${encodeURIComponent(plan.id)}`);

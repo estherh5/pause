@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { jsonResponse, renderApp } from '../test/render.jsx';
@@ -130,6 +130,16 @@ describe('/plans', () => {
     expect(screen.getByRole('heading', { name: 'My plans' })).toBeInTheDocument();
     await user.click(screen.getByRole('link', { name: '‹ Pause' }));
     expect(await screen.findByDisplayValue('sleep')).toBeInTheDocument();
+  });
+  it('Open with unsaved changes leaves new-tab and new-window clicks to the browser', async () => {
+    const user = userEvent.setup();
+    await dirtyThenPlans(user);
+    const link = await screen.findByRole('link', { name: 'Open' });
+    for (const init of [{ metaKey: true }, { ctrlKey: true }, { shiftKey: true }, { altKey: true }, { button: 1 }]) {
+      // fireEvent returns false when a handler called preventDefault.
+      expect(fireEvent.click(link, init)).toBe(true);
+      expect(screen.queryByRole('dialog')).toBeNull();
+    }
   });
   it('New plan with a clean planner goes to the planner without asking', async () => {
     const user = userEvent.setup();
