@@ -11,6 +11,11 @@ const TIMEOUT_MS = 2_000;
 export function sanitizeForFlare(text: string): string {
   const start = text.indexOf('\nparams:');
   if (start === -1) return text;
+  // An empty params line loses only its label, so a cause appended after it
+  // (`params: : SERVER_ERROR: ...`) survives. With values, cut to the frames.
+  const rest = text.slice(start + '\nparams:'.length);
+  const empty = /^ ?(?=$|\n|: )/.exec(rest);
+  if (empty) return text.slice(0, start) + sanitizeForFlare(rest.slice(empty[0].length));
   const frames = text.indexOf('\n    at ', start);
   return text.slice(0, start) + (frames === -1 ? '' : text.slice(frames));
 }

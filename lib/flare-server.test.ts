@@ -44,4 +44,11 @@ describe('withFlare', () => {
     expect(sanitizeForFlare('q\nparams: 1\nmore')).toBe('q');
     expect(sanitizeForFlare('plain')).toBe('plain');
   });
+
+  it('keeps a cause that follows an empty params line', () => {
+    expect(sanitizeForFlare('Failed query: q\nparams: : SERVER_ERROR: 502')).toBe('Failed query: q: SERVER_ERROR: 502');
+    expect(sanitizeForFlare('Failed query: q\nparams: ')).toBe('Failed query: q');
+    expect(sanitizeForFlare('E: q\nparams: \n    at a (x.js:1:1)')).toBe('E: q\n    at a (x.js:1:1)');
+    expect(sanitizeForFlare('q\nparams: a@b.com: SERVER_ERROR: 502')).toBe('q');
+  });
 });
