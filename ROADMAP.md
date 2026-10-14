@@ -29,4 +29,4 @@ Committed doc, not scratch. Kept current by hand as work ships.
 
 ## Open questions
 
-- **Should almanac read pause's saved plans as a source (pause to almanac)?** Almanac reads Turso dumps from `~/blob-backups/db/` locally, and a saved plan is a dated intention almanac could set beside what actually happened. Roughly 2h of work on almanac's side, nothing on pause's. Not approved; settle by Esther saying yes or no.
+- [from 2026-12-01] [needs data] **Should almanac read pause's saved plans as a source (pause to almanac)?** Deferred 2026-10-13 until real saved plans exist; none did then. Only `timeUnit: 'month'` plans carry a date (`month`, `year` in `db/schema.ts#plans`); day and week plans are undated templates, so only month plans could be set beside what actually happened. Cost if yes: roughly 2h on almanac's side (read `~/blob-backups/db/pause.sql`, filter to her `owner_email`), nothing on pause's. Settle by counting her saved month plans in that dump: if she keeps making them, yes; if not, decline.
