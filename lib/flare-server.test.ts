@@ -40,6 +40,7 @@ describe('withFlare', () => {
     expect(sent).toHaveLength(1);
     expect(sent[0]).not.toContain('@');
     expect(sent[0]).toContain('Failed query: select 1');
+    expect(sent[0]).toContain('at x (file.ts:1:1)');
     expect(sanitizeForFlare('q\nparams: 1\nmore')).toBe('q');
     expect(sanitizeForFlare('plain')).toBe('plain');
   });

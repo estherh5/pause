@@ -6,10 +6,13 @@ import type { VercelRequest, VercelResponse } from './vercel.js';
 const TIMEOUT_MS = 2_000;
 
 /** Drizzle's query errors embed the bound params ("Failed query: ...\nparams: a@b.com"),
- *  which are people's emails and plan names. Keep the query text, drop everything from params on. */
+ *  which are people's emails and plan names. Keep the query text, drop the params line;
+ *  on a stack, cut only up to the first frame so the frames survive. Same as flare's template. */
 export function sanitizeForFlare(text: string): string {
-  const i = text.indexOf('\nparams:');
-  return i < 0 ? text : text.slice(0, i);
+  const start = text.indexOf('\nparams:');
+  if (start === -1) return text;
+  const frames = text.indexOf('\n    at ', start);
+  return text.slice(0, start) + (frames === -1 ? '' : text.slice(frames));
 }
 
 export function flareServerEnabled(): boolean {
