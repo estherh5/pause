@@ -22,8 +22,10 @@
 
 .close-button {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 2px;
+  right: 2px;
+  inline-size: 44px;
+  block-size: 44px;
   font-size: 15px;
   padding: 0;
   border: none;
@@ -71,6 +73,7 @@
 
 .link-container {
   margin-top: 5px;
+  align-items: center;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -87,6 +90,8 @@
 }
 
 .link-container button {
+  inline-size: 44px;
+  block-size: 44px;
   font-size: 13px;
   padding: 0;
   border: none;

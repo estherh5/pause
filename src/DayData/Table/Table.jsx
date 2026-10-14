@@ -220,6 +220,7 @@ function Table({
                     <button
                       className="delete"
                       title="Remove activity"
+                      aria-label={`Remove ${activity.label}`}
                       onClick={() => onDeleteActivity(activity.id)}
                     >
                       x

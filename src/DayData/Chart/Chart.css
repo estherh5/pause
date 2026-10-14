@@ -3,8 +3,8 @@
 }
 
 .chart-button-container {
-  padding: 5px;
-  margin-bottom: 8px;
+  padding: 0;
+  margin-bottom: 4px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -21,9 +21,9 @@
 }
 
 .chart-button {
-  height: 20px;
-  width: 20px;
-  margin: 2px;
+  inline-size: 44px;
+  block-size: 44px;
+  padding: 0;
   visibility: visible;
   background: none;
   color: #dcdcdc;
@@ -31,14 +31,6 @@
 
 .chart-button:hover {
   color: #989696;
-}
-
-.pie {
-  margin-right: 6px;
-}
-
-.radar, .bar {
-  margin-right: 4px;
 }
 
 .selected {
@@ -75,21 +67,8 @@
     margin-top: 0px;
   }
 
-  .pie.week, .pie.month {
-    margin-right: 4px;
-  }
-
-  .radar.week, .radar.month, .bar.week, .bar.month {
-    margin-right: 2px;
-  }
-
   .chart-button {
     visibility: hidden;
-  }
-
-  .chart-button.week, .chart-button.month {
-    height: 18px;
-    width: 18px;
   }
 
   .chart-container:hover .chart-button {

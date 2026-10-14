@@ -28,6 +28,7 @@ h3 {
 
 #age-start, #age-end {
   width: 40px;
+  block-size: 44px;
   border-color: #dcdcdc;
   border-style: solid;
   border-width: 1px;

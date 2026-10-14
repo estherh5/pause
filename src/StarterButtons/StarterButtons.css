@@ -1,16 +1,17 @@
 #button-container button {
-  padding: 7px;
+  min-block-size: 44px;
+  padding: 0 12px;
   border-radius: 5px;
   margin: 5px;
   box-shadow: 1px 1px 1px #b7b7b7;
   visibility: visible;
-  background-color: #0088ff;
-  font-size: 13px;
+  background-color: #006ad0; /* white on it 5.3:1 */
+  font-size: 15px;
   color: #ffffff;
 }
 
 #button-container button:hover, #button-container button:disabled {
-  background-color: #0078e0;
+  background-color: #005fbf;
 }
 
 #button-container button:active, #button-container button:disabled {
