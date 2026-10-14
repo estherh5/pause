@@ -34,7 +34,10 @@ describe('App', () => {
     const box = screen.getByRole('combobox', { name: 'Toggle time period' });
     box.focus();
     await user.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}{Enter}');
-    expect(await screen.findByRole('button', { name: 'Next month' })).toBeInTheDocument();
+    // Wait on the title, then check the role: the month view is a large DOM,
+    // and under full-suite load one *ByRole poll outlasted the 1s budget.
+    await screen.findByTitle('Next month');
+    expect(screen.getByRole('button', { name: 'Next month' })).toBeInTheDocument();
   });
 
   it('adds an activity and updates the remaining hours', async () => {

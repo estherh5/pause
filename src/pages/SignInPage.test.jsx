@@ -6,7 +6,10 @@ vi.mock('react-chartjs-2', () => ({ Bar: () => null, Doughnut: () => null, Pie: 
 describe('/signin', () => {
   it('posts to Google with the next path and links Privacy', async () => {
     renderApp({ route: '/signin?next=%2Fstats' });
-    const button = await screen.findByRole('button', { name: 'Sign in with Google' });
+    // The file's first wait pays the lazy page import and a cold *ByRole poll;
+    // wait on the text, then check the role.
+    await screen.findByText('Sign in with Google');
+    const button = screen.getByRole('button', { name: 'Sign in with Google' });
     const form = button.closest('form');
     expect(form).toHaveAttribute('action', '/api/auth/signin/google');
     expect(form.querySelector('input[name="callbackUrl"]')).toHaveValue('/stats');

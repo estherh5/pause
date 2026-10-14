@@ -117,10 +117,12 @@ describe('planner drafts', () => {
     renderApp({ me: member, routes: { '/api/plans': () => jsonResponse([]) } });
     await pickWeek(user);
     await waitFor(() => expect(stored('plan:new')).not.toBeNull());
-    await user.click(await screen.findByRole('link', { name: 'My plans' }));
-    await user.click(await screen.findByRole('button', { name: /New plan/ }));
-    await user.click(await screen.findByRole('button', { name: 'Start new' }));
-    expect(await screen.findByRole('combobox', { name: 'Toggle time period' })).toHaveTextContent('day');
+    // Text and label waits, not *ByRole: under full-suite load a cold role
+    // poll ran longer than the 1s find* budget while /plans loaded.
+    await user.click(await screen.findByText('My plans'));
+    await user.click(await screen.findByText('+ New plan'));
+    await user.click(await screen.findByText('Start new'));
+    expect(await screen.findByLabelText('Toggle time period')).toHaveTextContent('day');
     expect(window.localStorage.getItem(draftKey('plan:new'))).toBeNull();
   });
 });

@@ -10,7 +10,10 @@ const row = (id, name, extra = {}) => ({ id, name, shareId: `SHARE${id}`.padEnd(
 describe('/plans', () => {
   it('lists plans with period, count and saved date', async () => {
     renderApp({ route: '/plans', me: member, routes: { '/api/plans': () => jsonResponse([row('a', 'Week one')]) } });
-    const item = await screen.findByRole('listitem');
+    // Wait on the row's text, not findByRole('listitem'): the loading skeleton
+    // is three listitems too, and a cold *ByRole poll is slow under load.
+    const item = (await screen.findByText('Week one')).closest('li');
+    expect(screen.getAllByRole('listitem')).toEqual([item]);
     expect(within(item).getByText('Week one')).toBeInTheDocument();
     expect(item).toHaveTextContent('Week · 3 activities · Saved Oct 12, 2026');
     expect(within(item).getByRole('link', { name: 'Open' })).toHaveAttribute('href', '/?plan=a');

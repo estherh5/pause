@@ -12,7 +12,10 @@ beforeEach(() => { window.localStorage.clear(); });
 describe('FeedbackWidget', () => {
   it('is bottom-left and only rendered for a member or the owner', async () => {
     const { unmount } = renderApp({ me: member });
-    expect(await screen.findByRole('button', { name: 'Send feedback' })).toHaveClass('pause-feedback-fab');
+    // Wait on the cheap label query; a *ByRole poll costs ~100ms cold here, and
+    // under full-suite load one poll alone outlasted the 1s find* budget.
+    await screen.findByLabelText('Send feedback');
+    expect(screen.getByRole('button', { name: 'Send feedback' })).toHaveClass('pause-feedback-fab');
     unmount();
     renderApp({ me: { state: 'guest', email: 'g@example.com' } });
     await screen.findByText(/Saved plans are by invitation/);
