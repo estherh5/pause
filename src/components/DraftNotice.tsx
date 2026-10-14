@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
 import type { DraftState } from "./useFormDraft";
+import "./DraftNotice.css";
 
 // Computed at render, so server and client can land either side of a minute
 // boundary — hence suppressHydrationWarning on the <time>, whose dateTime

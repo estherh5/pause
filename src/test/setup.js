@@ -4,6 +4,10 @@ import { afterEach, beforeEach } from 'vitest';
 
 afterEach(cleanup);
 
+// The planner keeps its unsaved plan in localStorage (form drafts), so one
+// test's edits would otherwise be restored into the next test's planner.
+afterEach(() => window.localStorage.clear());
+
 /**
  * The real network is out of bounds under test, by default.
  *

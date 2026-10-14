@@ -1,0 +1,14 @@
+/* ---- form drafts: the strip above a form that says what was kept ---- */
+.draft-notice-region { inline-size: 100%; }
+.draft-notice {
+  display: flex; flex-wrap: wrap; align-items: center; column-gap: 16px; margin-bottom: 12px;
+  padding: 0 12px; background: var(--pause-wash); border-radius: 3px; color: var(--pause-ink);
+}
+.draft-notice-text { flex: 1 1 14rem; min-inline-size: 0; margin: 0; padding: 8px 0; font-size: 14px; text-align: start; }
+.draft-notice-action {
+  flex-shrink: 0; min-block-size: 44px; padding: 0 6px; border: 0; background: none;
+  color: var(--pause-green-ink); font: 14px 'Raleway', sans-serif; text-decoration: underline; text-underline-offset: 2px; cursor: pointer;
+}
+.draft-notice-action:hover { color: var(--pause-ink); }
+.draft-notice-action:focus-visible { outline: 2px solid var(--pause-ink); outline-offset: 2px; }
+.draft-notice-discard.is-armed { color: var(--pause-red-ink); font-weight: 700; }

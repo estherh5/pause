@@ -9,6 +9,7 @@ import {
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { API_BASE, api, ApiError } from '../lib/api.js';
 import { isMember } from '../lib/queries.js';
+import DraftNotice from '../components/DraftNotice';
 import SavePlanDialog from '../components/SavePlanDialog.jsx';
 import { usePlanner } from '../lib/planner-context.jsx';
 import { planToSchedule, shareToSchedule } from '../lib/schedule.js';
@@ -19,7 +20,7 @@ import Modal from '../Modal/Modal.jsx';
 import StarterButtons from '../StarterButtons/StarterButtons.jsx';
 
 function Planner({ me = null }) {
-  const { schedule, setSchedule, loadSchedule, loadedShareId, currentPlan, isDirty } = usePlanner();
+  const { schedule, setSchedule, loadSchedule, loadedShareId, currentPlan, isDirty, draft } = usePlanner();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [saveOpen, setSaveOpen] = useState(false);
@@ -296,6 +297,7 @@ function Planner({ me = null }) {
             {currentPlan.id && isDirty && <span className="pause-muted"> · unsaved changes</span>}
           </p>
         )}
+        <DraftNotice draft={draft.state} onRestore={draft.restore} onDiscard={draft.discard} />
         <div id="day-data-container">
           {Object.keys(schedule.activities).map((id) => (
             <DayData
