@@ -67,6 +67,23 @@ describe('member reads own threads', () => {
   });
 });
 
+describe('member reads an emailed reply', () => {
+  it('GET ?mine=1 keeps channel but drops sourceMessageId and emailStatus', async () => {
+    // Discriminating case: a user/email message is the only kind that carries
+    // a provider message id; it must not reach the member's payload.
+    await file('mine');
+    const [row] = await db().select().from(feedback);
+    await db().insert(feedbackMessages).values({
+      id: 'm1', feedbackId: row.id, author: 'user', channel: 'email', body: 'by mail',
+      sourceMessageId: '<secret-id@mail.example>', createdAt: '2026-01-02T00:00:00.000Z',
+    });
+    const out = await call({ method: 'GET', query: { mine: '1' } });
+    const [r] = out.body as Array<{ messages: Array<Record<string, unknown>> }>;
+    expect(r.messages[0].channel).toBe('email');
+    expect(JSON.stringify(out.body)).not.toMatch(/sourceMessageId|secret-id|emailStatus/);
+  });
+});
+
 describe('owner routes', () => {
   it('plain GET lists everyone with delivery marks intact', async () => {
     await file('one');

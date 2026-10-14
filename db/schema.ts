@@ -69,9 +69,9 @@ export const feedback = sqliteTable('feedback', {
   updatedAt: text('updated_at'),
 });
 
-// Conversation thread for a feedback row: each reply (admin or, in principle,
-// user) is a row here instead of overwriting the single feedback.response
-// column. The legacy response column is kept (retained, no longer written) —
+// Conversation thread for a feedback row: each reply (admin, or the user
+// answering a reply email — api/inbound/feedback.ts) is a row here instead
+// of overwriting the single feedback.response column. The legacy response column is kept (retained, no longer written) —
 // existing non-empty responses are backfilled by
 // scripts/migrate-feedback-responses.sql as pre-tracking admin messages.
 export const feedbackMessages = sqliteTable(
@@ -82,7 +82,11 @@ export const feedbackMessages = sqliteTable(
       .notNull()
       .references(() => feedback.id, { onDelete: 'cascade' }),
     author: text('author').notNull(), // 'admin' | 'user'
+    channel: text('channel').notNull().default('web'), // 'web' | 'email' (an inbound reply to a feedback email)
     body: text('body').notNull(),
+    // Resend's message id for an inbound email reply. UNIQUE is the real dedupe:
+    // a provider retry re-delivers the same mail, and the second insert must fail.
+    sourceMessageId: text('source_message_id').unique(),
     emailStatus: text('email_status'), // 'sent' | 'failed' | 'skipped' | null (user messages, pre-tracking admin messages)
     createdAt: text('created_at').notNull(),
   },

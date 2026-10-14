@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const send = vi.fn();
 vi.mock('resend', () => ({
@@ -7,8 +7,15 @@ vi.mock('resend', () => ({
   }),
 }));
 
-import { sendFeedbackReplyEmail, makeFeedbackReplySender, buildFeedbackReplyEmail } from './feedback-email';
+import {
+  sendFeedbackReplyEmail,
+  makeFeedbackReplySender,
+  buildFeedbackReplyEmail,
+  sendInboundReplyNotification,
+} from './feedback-email';
 import { EMAIL_THEME } from './email-shell';
+import { decodeReplyAddress } from './feedback-thread-address';
+import { REPLY_SEPARATOR, stripQuotedReply } from './email-reply-parser';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -86,11 +93,74 @@ describe('sendFeedbackReplyEmail', () => {
   });
 });
 
+describe('reply separator', () => {
+  it('opens both the html and the text part with the separator the inbound parser cuts at', () => {
+    const { html, text } = buildFeedbackReplyEmail('hi there');
+    expect(text.startsWith(REPLY_SEPARATOR)).toBe(true);
+    expect(html.indexOf(REPLY_SEPARATOR)).toBeLessThan(html.indexOf('FEEDBACK REPLY'));
+    // A client that quotes the whole text part under the user's line:
+    expect(stripQuotedReply(`thanks!\n\n${text.split('\n').map((l) => `> ${l}`).join('\n')}`)).toBe('thanks!');
+  });
+});
+
 describe('makeFeedbackReplySender', () => {
-  it('delegates to sendFeedbackReplyEmail with the feedback row\'s email', async () => {
+  afterEach(() => {
+    delete process.env.FEEDBACK_REPLY_SECRET;
+    delete process.env.FEEDBACK_REPLY_DOMAIN;
+  });
+
+  it("delegates to sendFeedbackReplyEmail with the feedback row's email", async () => {
     const sender = makeFeedbackReplySender();
-    const outcome = await sender({ userEmail: 'friend@example.com' }, 'body text');
+    const outcome = await sender({ id: 'fb-1', userEmail: 'friend@example.com' }, 'body text');
     expect(outcome).toBe('sent');
     expect(send.mock.calls[0][0]).toMatchObject({ to: 'friend@example.com' });
+  });
+
+  it('carries a signed reply+a Reply-To that decodes back to this feedback id', async () => {
+    // Discriminating case: the address must verify under the SAME secret and
+    // name this row's id — a well-formed but unsigned address would not.
+    process.env.FEEDBACK_REPLY_SECRET = 'reply-secret';
+    await makeFeedbackReplySender()({ id: 'fb-1', userEmail: 'friend@example.com' }, 'body text');
+    const replyTo = send.mock.calls[0][0].replyTo as string;
+    expect(replyTo).toMatch(/^reply\+a\.fb-1\.[0-9a-f]{16}@crystalprism\.io$/);
+    expect(decodeReplyAddress(replyTo, 'reply-secret')).toEqual({ ok: true, feedbackId: 'fb-1' });
+    expect(decodeReplyAddress(replyTo, 'other-secret').ok).toBe(false);
+  });
+
+  it('honors FEEDBACK_REPLY_DOMAIN', async () => {
+    process.env.FEEDBACK_REPLY_SECRET = 'reply-secret';
+    process.env.FEEDBACK_REPLY_DOMAIN = 'example.test';
+    await makeFeedbackReplySender()({ id: 'fb-1', userEmail: 'friend@example.com' }, 'x');
+    expect(send.mock.calls[0][0].replyTo).toMatch(/@example\.test$/);
+  });
+
+  it('still sends, with no Reply-To, when FEEDBACK_REPLY_SECRET is empty', async () => {
+    process.env.FEEDBACK_REPLY_SECRET = '';
+    const outcome = await makeFeedbackReplySender()({ id: 'fb-1', userEmail: 'friend@example.com' }, 'x');
+    expect(outcome).toBe('sent');
+    expect(send.mock.calls[0][0].replyTo).toBeUndefined();
+  });
+});
+
+describe('sendInboundReplyNotification', () => {
+  afterEach(() => {
+    delete process.env.OWNER_EMAIL;
+  });
+
+  it('emails the owner (OWNER_EMAIL) with the excerpt and a triage link', async () => {
+    process.env.OWNER_EMAIL = 'Owner@Example.com';
+    await sendInboundReplyNotification({ fromEmail: 'u@x.com', excerpt: 'still broken' });
+    const msg = send.mock.calls[0][0];
+    expect(msg.to).toBe('owner@example.com');
+    expect(msg.subject).toContain('u@x.com');
+    expect(msg.text).toContain('still broken');
+    expect(msg.text).toContain('https://pause.crystalprism.io/admin/feedback');
+  });
+
+  it('never throws when the send rejects', async () => {
+    send.mockRejectedValue(new Error('resend down'));
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await expect(sendInboundReplyNotification({ fromEmail: 'u@x.com', excerpt: 'x' })).resolves.toBeUndefined();
+    spy.mockRestore();
   });
 });

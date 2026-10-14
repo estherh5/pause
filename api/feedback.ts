@@ -4,7 +4,7 @@ import { db } from '../db/index.js';
 import { feedback } from '../db/schema.js';
 import { one, readBody, requireMember, requireOwner, uid } from '../lib/api-helpers.js';
 import { withFlare } from '../lib/flare-server.js';
-import { appendAdminReply, FeedbackReplyValidationError, listThreadsFor, stripEmailStatus } from '../lib/feedback.js';
+import { appendAdminReply, FeedbackReplyValidationError, listThreadsFor, stripEmailTelemetry } from '../lib/feedback.js';
 import { makeFeedbackReplySender } from '../lib/feedback-email.js';
 
 const TYPES = ['bug', 'idea', 'other'];
@@ -83,7 +83,7 @@ async function handler(req: VercelRequest, res: VercelResponse) {
         db,
         rows.map((r) => r.id),
       );
-      res.json(rows.map((r) => ({ ...r, messages: (threads.get(r.id) ?? []).map(stripEmailStatus) })));
+      res.json(rows.map((r) => ({ ...r, messages: (threads.get(r.id) ?? []).map(stripEmailTelemetry) })));
       return;
     }
 
