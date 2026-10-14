@@ -51,6 +51,23 @@ describe('InviteComposer', () => {
     expect(screen.getByLabelText(/Note/)).toHaveValue('keep me');
   });
 
+  // Only a 400 carries a sentence; every other refusal is a code, and none of
+  // them is a connection problem.
+  it.each([
+    [() => jsonResponse({ error: 'unauthorized' }, 401), 'You were signed out. Sign in again, then retry.'],
+    [() => jsonResponse({ error: 'forbidden' }, 403), 'Only the owner can send invitations.'],
+    [() => jsonResponse({ error: 'internal' }, 500), "Something went wrong on Pause's side. Try again in a minute."],
+    [() => { throw new TypeError('Failed to fetch'); }, "The invitation didn't send. Check your connection and try again."],
+  ])('a refusal that is not a 400 says what to do (%#)', async (respond, text) => {
+    const user = userEvent.setup();
+    const { setRespond } = mount();
+    setRespond(respond);
+    await user.type(screen.getByLabelText('Email'), 'new@example.com');
+    await user.click(screen.getByRole('button', { name: 'Send invite' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(text);
+    expect(screen.getByLabelText('Email')).toHaveValue('new@example.com');
+  });
+
   it('a typed note survives an unmount and remount', async () => {
     const user = userEvent.setup();
     const first = mount();

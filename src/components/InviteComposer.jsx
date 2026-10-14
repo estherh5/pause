@@ -36,9 +36,13 @@ export default function InviteComposer() {
       });
       await queryClient.invalidateQueries({ queryKey: ['invites'] });
     } catch (err) {
-      let text = "The invitation didn't send. Check your connection and try again.";
-      if (err instanceof ApiError && err.code === 'already-member') text = `${to} is already a member.`;
-      else if (err instanceof ApiError && err.status === 400 && err.code) text = err.code;
+      // Only a 400 carries a sentence; every other refusal is a code.
+      let text = "Something went wrong on Pause's side. Try again in a minute.";
+      if (!(err instanceof ApiError)) text = "The invitation didn't send. Check your connection and try again.";
+      else if (err.code === 'already-member') text = `${to} is already a member.`;
+      else if (err.status === 400 && err.code) text = err.code;
+      else if (err.status === 401) text = 'You were signed out. Sign in again, then retry.';
+      else if (err.status === 403) text = 'Only the owner can send invitations.';
       setResult({ ok: false, text });
     } finally {
       inFlight.current = false;
