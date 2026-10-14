@@ -4,7 +4,8 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 // copied from @vercel/node's index.d.ts. That package was only ever imported
 // for these two types, and even its latest major pins vulnerable undici and
 // path-to-regexp; Vercel's builder supplies its own runtime, so the app does
-// not need the package installed at all.
+// not need the package installed at all. The `any`s are kept as upstream wrote them.
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type VercelRequest = IncomingMessage & {
   query: { [key: string]: string | string[] };
   cookies: { [key: string]: string };

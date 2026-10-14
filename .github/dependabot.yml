@@ -14,3 +14,7 @@ updates:
     ignore:
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+      # typescript-eslint 8 peers typescript <6.1, and TypeScript 7 has no JS
+      # API for it; ROADMAP.md tracks moving back to 7.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]

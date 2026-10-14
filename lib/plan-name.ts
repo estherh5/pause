@@ -1,5 +1,6 @@
 export const MAX_NAME_LENGTH = 80;
 // C0 controls and DEL; line breaks and tabs are the ones people actually paste.
+// eslint-disable-next-line no-control-regex -- matching control characters is the point
 const CONTROL = /[\u0000-\u001f\u007f]/;
 
 export function nameKey(name: string): string {
