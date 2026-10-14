@@ -26,6 +26,13 @@ describe('/stats', () => {
     expect(screen.getByText('Plus 2 more activities')).toBeInTheDocument();
     expect(screen.getByText('Plus 1 plan with no activities.')).toBeInTheDocument();
   });
+  it('a non-zero bar never prints 0 h: under a quarter hour reads "< 0.25 h"', async () => {
+    renderApp({ route: '/stats', me: member, routes: { '/api/stats': () => jsonResponse({ ...stats, hours: [{ label: 'stretch', hours: 30 }, { label: 'blink', hours: 0.1 }] }) } });
+    const hours = await screen.findByRole('list', { name: 'Hours planned' });
+    const li = within(hours).getByText('blink').closest('li');
+    expect(li.querySelector('.stat-fill')).not.toBeNull();
+    expect(within(li).getByText('< 0.25 h', { selector: '.stat-value' })).toBeInTheDocument();
+  });
   it('a month with no plans shows a real 0', async () => {
     renderApp({ route: '/stats', me: member, routes: { '/api/stats': () => jsonResponse(stats) } });
     const months = await screen.findByRole('list', { name: 'Plans per month' });

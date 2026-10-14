@@ -5,7 +5,11 @@ import { isMember, useStats } from '../lib/queries.js';
 import './StatsPage.css';
 
 const TOP = 12;
-const fmtHours = (h) => `${Math.round(h * 4) / 4} h`;
+// Quarter-hour rounding, except a non-zero total never rounds down to a bare "0 h" beside its bar.
+const fmtHours = (h) => {
+  const q = Math.round(h * 4) / 4;
+  return h > 0 && q === 0 ? '< 0.25 h' : `${q} h`;
+};
 const NONE = 'None of your plans has activities yet.';
 
 function Bars({ label, rows, max, value }) {
