@@ -6,6 +6,7 @@ Committed doc, not scratch. Kept current by hand as work ships.
 
 ## Shipped
 
+- **2026-10** [security] Dependabot alert #259 (esbuild <= 0.24.2 dev-server request leak, moderate) closed: drizzle-kit's `@esbuild-kit/core-utils` pinned to esbuild `^0.25.12` via `overrides`, the fleet's existing fix. `npm audit` clean.
 - **2026-10** Optional Google sign-in (crystalprism.io ring) with invite-only saved plans: name, open, rename, delete and share plans (My plans), /stats, invitations, feedback. Hosting moved from Netlify to Vercel; share links moved from pause_api into Turso with their ids.
 - **2026-10 — Fleet apps + account menu and footer.** The old table-style site menu (top-left) is gone; the fleet kit's apps menu sits at the header's trailing end, listing every live app from `crystalprism.io/apps.json` (baked fallback on failure), with no account rows since pause has no sign-in. `FleetFooter` replaces the inline copyright. Kit copied byte-identical into `src/components` + `src/lib`; tokens in `src/index.css`.
 - 2026-10 Flare reports now carry a wrapped error's `params` and its `cause` chain (`errorDetail` in `src/lib/flare.js`, ported from the Next template), with the template's six cases in `src/lib/flare.test.js`.
