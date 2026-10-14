@@ -3,7 +3,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import SignInButton from '../components/SignInButton.jsx';
-import { api } from '../lib/api.js';
+import { ApiError, api } from '../lib/api.js';
+import { useMe } from '../lib/queries.js';
 import './AuthPages.css';
 
 const Shell = ({ children }) => (
@@ -28,7 +29,11 @@ export default function InvitePage({ me }) {
   const view = resolved?.token === token ? resolved.view : null;
   const [outcome, setOutcome] = useState(null);
   const [pending, setPending] = useState(false);
+  // Why the last Accept didn't land: 'expired' (401) or 'unreachable' (network/5xx).
+  const [acceptFailure, setAcceptFailure] = useState(null);
   const inFlight = useRef(false);
+  // Same ['me'] query App reads, so this adds no fetch; App only passes the data.
+  const { isError: meFailed, refetch: retryMe, isFetching: meFetching } = useMe();
 
   useEffect(() => {
     let live = true;
@@ -38,6 +43,14 @@ export default function InvitePage({ me }) {
     return () => { live = false; };
   }, [token]);
 
+  if (!me && meFailed) {
+    return (
+      <Shell>
+        <p role="alert" className="pause-error">Couldn&apos;t reach Pause.</p>
+        <button type="button" className="pause-button" aria-disabled={meFetching} onClick={() => !meFetching && retryMe()}>Try again</button>
+      </Shell>
+    );
+  }
   if (!view || !me) return <Shell><p role="status" className="pause-muted">Opening the invitation</p></Shell>;
   if (view.state !== 'valid') return <Invalid />;
 
@@ -63,12 +76,21 @@ export default function InvitePage({ me }) {
     if (inFlight.current) return;
     inFlight.current = true;
     setPending(true);
+    setAcceptFailure(null);
     api.acceptInvite(token)
       .then((o) => {
         setOutcome(o);
         if (o.ok) queryClient.invalidateQueries({ queryKey: ['me'] });
       })
-      .catch(() => setOutcome({ ok: false, reason: 'invalid' }))
+      // Only an outcome the server states makes the link dead; anything else is retryable.
+      .catch((e) => {
+        if (e instanceof ApiError && e.status === 401) {
+          setAcceptFailure('expired');
+          queryClient.invalidateQueries({ queryKey: ['me'] });
+        } else {
+          setAcceptFailure('unreachable');
+        }
+      })
       .finally(() => { inFlight.current = false; setPending(false); });
   };
 
@@ -76,7 +98,12 @@ export default function InvitePage({ me }) {
     <Shell>
       <p>{`${view.invitedBy} invited ${view.maskedEmail} to save plans in Pause.`}</p>
       {view.note && <p className="pause-muted">{view.note}</p>}
-      {me.state === 'signed-out' ? (
+      {acceptFailure && (
+        <p role="alert" className="pause-error">
+          {acceptFailure === 'expired' ? 'Your sign-in expired. Sign in again to accept.' : "Couldn't reach Pause. Try again."}
+        </p>
+      )}
+      {me.state === 'signed-out' || acceptFailure === 'expired' ? (
         <SignInButton next={`/invite/${token}`} />
       ) : (
         <button type="button" className="pause-button" aria-disabled={pending} onClick={accept}>Accept</button>

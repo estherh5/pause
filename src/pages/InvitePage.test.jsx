@@ -58,6 +58,48 @@ describe('/invite/:token', () => {
     expect(await screen.findByText("This invitation link doesn't work. Ask for a new one.")).toBeInTheDocument();
   });
 
+  it('/api/me failing says so and retries, instead of opening forever', async () => {
+    let meUp = false;
+    renderApp({
+      route: '/invite/tok',
+      routes: {
+        '/api/access': access(VALID),
+        '/api/me': () => (meUp ? jsonResponse(FRIEND) : jsonResponse({ error: 'down' }, 500)),
+      },
+    });
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't reach Pause.");
+    expect(screen.queryByText(/Opening the invitation/)).not.toBeInTheDocument();
+    meUp = true;
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByRole('button', { name: 'Accept' })).toBeInTheDocument();
+  });
+
+  it('a 401 on Accept asks to sign in again and returns here, not "dead link"', async () => {
+    renderApp({
+      route: '/invite/tok-abc', me: FRIEND,
+      routes: { '/api/access': access(VALID, () => jsonResponse({ error: 'unauthorized' }, 401)) },
+    });
+    await userEvent.click(await screen.findByRole('button', { name: 'Accept' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Your sign-in expired. Sign in again to accept.');
+    const button = await screen.findByRole('button', { name: 'Sign in with Google' });
+    expect(button.closest('form').querySelector('input[name="callbackUrl"]')).toHaveValue('/invite/tok-abc');
+    expect(screen.queryByText(/doesn't work/)).not.toBeInTheDocument();
+  });
+
+  it('a network failure on Accept keeps the invitation and lets you try again', async () => {
+    let up = false;
+    renderApp({
+      route: '/invite/tok', me: FRIEND,
+      routes: { '/api/access': access(VALID, () => { if (!up) throw new Error('offline'); return jsonResponse({ ok: true }); }) },
+    });
+    await userEvent.click(await screen.findByRole('button', { name: 'Accept' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't reach Pause. Try again.");
+    expect(screen.queryByText(/doesn't work/)).not.toBeInTheDocument();
+    up = true;
+    await userEvent.click(screen.getByRole('button', { name: 'Accept' }));
+    expect(await screen.findByText(/You're in/)).toBeInTheDocument();
+  });
+
   it('Accept cannot be pressed twice while in flight', async () => {
     let release;
     const gate = new Promise((r) => { release = r; });

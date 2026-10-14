@@ -16,7 +16,7 @@ export function renderApp({ route = '/', me = { state: 'signed-out' }, routes = 
     const url = typeof input === 'string' ? input : input.url;
     const path = url.replace(/^https?:\/\/[^/]+/, '');
     calls.push({ path, method: init.method ?? 'GET', body: init.body ? JSON.parse(init.body) : undefined });
-    if (path === '/api/me') return jsonResponse(me);
+    if (path === '/api/me') return routes['/api/me'] ? routes['/api/me'](path, init) : jsonResponse(me);
     if (path === '/api/auth/csrf') return jsonResponse({ csrfToken: 't' });
     const hit = Object.keys(routes).filter((p) => path.startsWith(p)).sort((a, b) => b.length - a.length)[0];
     if (hit) return routes[hit](path, init);
