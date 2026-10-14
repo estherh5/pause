@@ -6,6 +6,7 @@ Committed doc, not scratch. Kept current by hand as work ships.
 
 ## Shipped
 
+- **2026-10 — Invite row errors read as sentences.** `InviteRow` `errorText` maps each status (401, 403, 404, 409, 5xx, no connection) to what to do next instead of showing the server's code, and Remove's result says the consequence (`REMOVE_DONE`).
 - **2026-10 — Open in a new tab works on /plans with unsaved changes.** `PlanRow#open` asks about unsaved changes only for a plain left click; Cmd/Ctrl/Shift/Alt and middle clicks go to the browser, since a new tab leaves the planner untouched.
 - **2026-10 — The admin feedback inbox has tests.** `src/pages/AdminFeedbackPage.test.jsx` covers the owner gate, the empty inbox, reply success/failure/400, a blank reply, status save and revert, and a double click on Send reply sending exactly one reply. The in-flight guard was already in `FeedbackRow#sendReply` (an early return plus a disabled button); the test goes red with both removed.
 - **2026-10 — The invitation page no longer dead-ends.** When `/api/me` fails it says "Couldn't reach Pause." with a Try again button instead of "Opening the invitation" forever. A 401 on Accept says the sign-in expired and offers Google sign-in that returns to the same invitation. A network or server failure on Accept keeps the invitation on screen with Accept still live. Only an outcome the server states (`invalid`, `mismatch`) now makes the link read as dead. (`src/pages/InvitePage.jsx`)
@@ -25,7 +26,6 @@ Committed doc, not scratch. Kept current by hand as work ships.
 
 - [from 2026-10-15] **Confirm the first nightly dump of the pause DB.** `~/blob-backups/db/pause.sql` exists and the run log shows "db pause:"; restore once with `~/blob-backups/restore-db.sh pause` into a scratch DB and compare plan counts (4 legacy rows on 2026-10-14).
 - **Prove one real email reply lands in a feedback thread.** The inbound webhook is live on `pause.crystalprism.io/api/inbound/feedback` (GET 405, unsigned POST 401, checked 2026-10-14), but no real reply has gone through yet. Reply from Gmail to an admin reply email from Pause; the message should appear in the thread with the "via email" mark and reopen it (`api/inbound/feedback.ts`).
-- **`InviteRow` error copy.** Non-400 errors show raw server codes, and Remove's result text doesn't say what happens next.
 - **`fmtHours` prints "0 h"** for anything under 0.125h, beside a non-zero bar on /stats.
 - **`countActivities` misses legacy string ids.** It checks `a.id === 0`, so a legacy row whose total row id is the string "0" miscounts; it only matters if a legacy share is ever saved into an account.
 - [from 2026-10-27] **Retire pause_api.** Confirm zero requests on `pause-api.crystalprism.io` for 14 days in Vercel logs, remove its Vercel project domain, archive the repo. The Neon table is dropped only with a fresh dump and a separate approval.

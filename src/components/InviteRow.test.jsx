@@ -8,6 +8,7 @@ import { jsonResponse } from '../test/render.jsx';
 const inv = (over) => ({ id: 'i1', email: 'a@example.com', note: null, invitedBy: 'o@example.com', createdAt: 1, expiresAt: 2, acceptedAt: null, revokedAt: null, emailStatus: 'sent', status: 'pending', ...over });
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const REMOVE_ARM = 'They lose saved plans right away. Their plans stay, and Restore brings them back.';
+const REMOVE_DONE = "Removed. They can't open saved plans anymore. Their plans are kept, and Restore brings them back.";
 
 function mount(row) {
   const calls = [];
@@ -54,6 +55,34 @@ describe('InviteRow', () => {
     await wait(400);
     await user.click(screen.getByRole('button', { name: 'Really remove?' }));
     expect(calls[0].path).toBe('/api/access?resource=invites&action=revoke');
+    expect(await screen.findByText(REMOVE_DONE)).toBeInTheDocument();
+  });
+
+  // The server answers with codes ('not found', 'revoked', 'unauthorized',
+  // 'forbidden') that are never fit to show; each status gets a sentence that
+  // says what to do next.
+  it.each([
+    [404, { error: 'not found' }, 'This invitation is gone. Reload the page to see the current list.'],
+    [409, { error: 'revoked' }, 'This invitation was revoked. Restore it first, then resend.'],
+    [401, { error: 'unauthorized' }, 'You were signed out. Sign in again, then retry.'],
+    [403, { error: 'forbidden' }, 'Only the owner can change invitations.'],
+    [500, { error: 'internal' }, "Something went wrong on Pause's side. Try again in a minute."],
+    [405, 'Method Not Allowed', "Something went wrong on Pause's side. Try again in a minute."],
+  ])('a %i on Resend reads as a sentence, never the raw code', async (status, body, text) => {
+    vi.stubGlobal('fetch', vi.fn(async () =>
+      new Response(typeof body === 'string' ? body : JSON.stringify(body), { status })));
+    const user = userEvent.setup();
+    render(<QueryClientProvider client={new QueryClient()}><ul><InviteRow inv={inv()} /></ul></QueryClientProvider>);
+    await user.click(screen.getByRole('button', { name: 'Resend' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(text);
+  });
+
+  it('a dropped connection says to check it', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new TypeError('Failed to fetch'); }));
+    const user = userEvent.setup();
+    render(<QueryClientProvider client={new QueryClient()}><ul><InviteRow inv={inv()} /></ul></QueryClientProvider>);
+    await user.click(screen.getByRole('button', { name: 'Resend' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent("That didn't go through. Check your connection and try again.");
   });
 
   it('a held Enter cannot arm and confirm in one gesture', async () => {
@@ -83,7 +112,7 @@ describe('InviteRow', () => {
     await wait(400);
     screen.getByRole('button', { name: 'Really remove?' }).focus();
     await user.keyboard('{Enter}');
-    await screen.findByText('Removed.');
+    await screen.findByText(REMOVE_DONE);
     update(inv({ status: 'revoked', acceptedAt: 5, revokedAt: 6 }));
     const restore = await screen.findByRole('button', { name: 'Restore' });
     expect(restore).toHaveFocus();

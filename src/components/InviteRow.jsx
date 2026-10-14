@@ -11,8 +11,22 @@ const ARM_MS = 4000;
 const ARM_MIN_MS = 350;
 
 /** Admission is read from the database on every request (spec 3), so Remove
- *  bites on the person's next request. If that changes, this sentence must too. */
+ *  bites on the person's next request. If that changes, both sentences must too. */
 const REMOVE_COPY = 'They lose saved plans right away. Their plans stay, and Restore brings them back.';
+const REMOVE_DONE = "Removed. They can't open saved plans anymore. Their plans are kept, and Restore brings them back.";
+
+/** The server answers with codes ('not found', 'revoked', 'unauthorized',
+ *  'forbidden'), never sentences, so the row says what to do by status. */
+function errorText(err) {
+  switch (err?.status) {
+    case undefined: return "That didn't go through. Check your connection and try again.";
+    case 401: return 'You were signed out. Sign in again, then retry.';
+    case 403: return 'Only the owner can change invitations.';
+    case 404: return 'This invitation is gone. Reload the page to see the current list.';
+    case 409: return 'This invitation was revoked. Restore it first, then resend.';
+    default: return "Something went wrong on Pause's side. Try again in a minute.";
+  }
+}
 
 const STATUS_LABEL = { pending: 'Invited', accepted: 'Accepted', expired: 'Expired', revoked: 'Revoked' };
 const when = (ms) => new Date(ms).toLocaleDateString();
@@ -70,7 +84,7 @@ export default function InviteRow({ inv }) {
       refocusFrom.current = from;
       await queryClient.invalidateQueries({ queryKey: ['invites'] });
     } catch (err) {
-      setError(err?.message && err.status ? err.message : "That didn't go through. Check your connection and try again.");
+      setError(errorText(err));
     } finally {
       inFlight.current = false;
       setBusyKind(null);
@@ -124,7 +138,7 @@ export default function InviteRow({ inv }) {
         )}
         {removable && (
           <button type="button" className={`pause-quiet invite-danger${armed ? ' is-armed' : ''}`} disabled={busy}
-            onClick={() => armedPress('remove', 'Removed.')}>
+            onClick={() => armedPress('remove', REMOVE_DONE)}>
             {busyKind === 'remove' ? 'Removing…' : armed ? 'Really remove?' : 'Remove'}
           </button>
         )}
