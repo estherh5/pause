@@ -11,7 +11,7 @@
     { "source": "/api/feedback/:id", "destination": "/api/feedback?id=:id" },
     { "source": "/((?!api/|@)[^.]*)", "destination": "/index.html" }
   ],
-  "git": { "deploymentEnabled": { "flare/*": false, "dependabot/**": false } },
+  "git": { "deploymentEnabled": false },
   "headers": [
     {
       "source": "/(.*)",
