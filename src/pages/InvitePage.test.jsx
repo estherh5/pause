@@ -53,8 +53,18 @@ describe('/invite/:token', () => {
     expect(screen.queryByRole('button', { name: 'Accept' })).not.toBeInTheDocument();
   });
 
-  it('a network failure resolving the link reads as invalid', async () => {
-    renderApp({ route: '/invite/tok', routes: { '/api/access': () => { throw new Error('offline'); } } });
+  it('a network failure resolving the link offers Try again, never "doesn\'t work"', async () => {
+    let up = false;
+    renderApp({ route: '/invite/tok', routes: { '/api/access': (...a) => { if (!up) throw new Error('offline'); return access(VALID)(...a); } } });
+    expect(await screen.findByText("Couldn't reach Pause.")).toBeInTheDocument();
+    expect(screen.queryByText("This invitation link doesn't work. Ask for a new one.")).not.toBeInTheDocument();
+    up = true;
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByRole('button', { name: 'Sign in with Google' })).toBeInTheDocument();
+  });
+
+  it('a 4xx resolving the link reads as invalid', async () => {
+    renderApp({ route: '/invite/tok', routes: { '/api/access': () => jsonResponse({ error: 'not-found' }, 404) } });
     expect(await screen.findByText("This invitation link doesn't work. Ask for a new one.")).toBeInTheDocument();
   });
 

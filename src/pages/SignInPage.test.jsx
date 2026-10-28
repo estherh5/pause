@@ -1,4 +1,6 @@
-import { screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import SignInButton from '../components/SignInButton.jsx';
 import { describe, expect, it, vi } from 'vitest';
 import { renderApp } from '../test/render.jsx';
 
@@ -28,5 +30,18 @@ describe('/signin', () => {
   it('a signed-in visitor is sent to /plans', async () => {
     renderApp({ route: '/signin', me: { state: 'member', email: 'm@example.com', name: null }, routes: { '/api/plans': () => new Response('[]') } });
     expect(await screen.findByRole('heading', { name: 'My plans' })).toBeInTheDocument();
+  });
+
+  it('a failed CSRF fetch says so and retries, instead of enabling a button that cannot work', async () => {
+    let up = false;
+    vi.stubGlobal('fetch', vi.fn(async () => (up
+      ? new Response(JSON.stringify({ csrfToken: 't' }), { headers: { 'content-type': 'application/json' } })
+      : Promise.reject(new Error('offline')))));
+    render(<SignInButton next="/plans" />);
+    expect(await screen.findByText("Couldn't reach sign-in.")).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Sign in with Google' })).not.toBeInTheDocument();
+    up = true;
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByRole('button', { name: 'Sign in with Google' })).toBeEnabled();
   });
 });

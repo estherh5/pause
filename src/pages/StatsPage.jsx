@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import BackLink from '../components/BackLink.jsx';
 import AccessNote from '../components/AccessNote.jsx';
+import MeStatus from '../components/MeStatus.jsx';
 import { isMember, useStats } from '../lib/queries.js';
 import './StatsPage.css';
 
@@ -41,7 +42,7 @@ export default function StatsPage({ me }) {
   const s = q.data;
 
   let body;
-  if (!me) body = null;
+  if (!me) body = <MeStatus />;
   else if (!member) body = <AccessNote me={me} next="/stats" />;
   else if (q.isPending) body = <div aria-busy="true">{[0, 1, 2].map((i) => <div key={i} className="pause-skeleton stat-skeleton" />)}</div>;
   else if (q.isError) body = (
@@ -53,7 +54,7 @@ export default function StatsPage({ me }) {
   else if (s.empty) body = (
     <div className="pause-access">
       <p>Stats appear once you save a plan.</p>
-      <a className="pause-link" href="/">Plan something</a>
+      <a className="pause-link pause-tap" href="/">Plan something</a>
     </div>
   );
   else {

@@ -45,7 +45,7 @@ function StarterButtons({ disabled, onButtonClick }) {
     const activities = type === 'clear'
       ? createStartingActivities()
       : STARTER_SETS[type].map((activity) => ({ ...activity }));
-    onButtonClick(activities);
+    onButtonClick(activities, type === 'clear' ? 'Cleared.' : `Replaced with ${type[0].toUpperCase()}${type.slice(1)}.`);
   }
 
   return (
@@ -56,7 +56,8 @@ function StarterButtons({ disabled, onButtonClick }) {
           <button
             key={key}
             id={key}
-            title={`${type} activities`}
+            type="button"
+            title={type === 'Clear' ? 'Clear all activities' : `Replace with ${type.toLowerCase()} activities`}
             disabled={disabled}
             onClick={() => toggleActivities(key)}
           >

@@ -3,7 +3,6 @@
 .pause-section-title { margin: 0 0 8px; font-size: 22px; font-weight: normal; }
 .pause-form-gap { margin-bottom: 14px; }
 .pause-textarea { min-block-size: 96px; resize: vertical; line-height: 1.4; }
-.pause-tap { display: inline-flex; align-items: center; min-block-size: 44px; }
 .pause-settings-link { margin: 24px 0 0; }
 .pause-check { display: flex; align-items: center; gap: 10px; min-block-size: 44px; margin: 4px 0; font-size: 16px; cursor: pointer; }
 .pause-check input { inline-size: 20px; block-size: 20px; accent-color: var(--pause-ink); }

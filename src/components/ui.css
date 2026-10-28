@@ -50,5 +50,9 @@
 .pause-muted { color: var(--pause-muted); }
 .pause-error { color: var(--pause-red-ink); }
 .pause-skeleton { block-size: 18px; border-radius: 3px; background: var(--pause-wash); }
+.pause-tap { display: inline-flex; align-items: center; min-block-size: 44px; }
+.pause-load-failure { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 16px; }
+.pause-load-failure p { margin: 0; }
+.pause-skeleton-row { block-size: 44px; margin-block-end: 12px; }
 .pause-access { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
 .pause-visually-hidden { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import BackLink from '../components/BackLink.jsx';
 import AccessNote from '../components/AccessNote.jsx';
+import MeStatus from '../components/MeStatus.jsx';
 import { useConfirm } from '../components/ConfirmDialog.jsx';
 import { api, ApiError } from '../lib/api.js';
 import { isMember, usePlans } from '../lib/queries.js';
@@ -184,7 +185,7 @@ export default function PlansPage({ me }) {
       <BackLink />
       <h1 ref={titleRef} tabIndex={-1} className="pause-page-title">My plans</h1>
       <p role="status" className="pause-visually-hidden">{status}</p>
-      {!me ? null : !member ? <AccessNote me={me} next="/plans" /> : plans.isPending ? (
+      {!me ? <MeStatus /> : !member ? <AccessNote me={me} next="/plans" /> : plans.isPending ? (
         <ul className="plan-list" aria-busy="true">{[0, 1, 2].map((i) => <li key={i} className="plan-row"><div className="pause-skeleton" style={{ inlineSize: `${60 - i * 10}%` }} /></li>)}</ul>
       ) : plans.isError ? (
         <div className="pause-access">

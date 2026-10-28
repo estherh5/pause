@@ -39,6 +39,13 @@ function Planner({ me = null }) {
     note: null,
   });
   const [isSaving, setIsSaving] = useState(false);
+  // A failed ?plan= or ?activities= load stays in the status slot with its own
+  // Try again, instead of a modal that can only be closed.
+  const [loadFailure, setLoadFailure] = useState(null); // { message, retry?, plansLink? }
+  const [shareLoading, setShareLoading] = useState(false);
+  const [shareAttempt, setShareAttempt] = useState(0);
+  // The schedule a starter or Clear replaced, kept while the replacement is untouched.
+  const [undo, setUndo] = useState(null); // { label, previous, applied }
   const apiUrl = API_BASE;
 
   const showError = useCallback((message) => {
@@ -58,18 +65,20 @@ function Planner({ me = null }) {
     api.getPlan(planId)
       .then((p) => {
         if (!live) return;
+        setLoadFailure(null);
         loadSchedule(planToSchedule(p), { id: p.id, name: p.name, shareId: p.shareId });
         navigate('/', { replace: true });
       })
       .catch((err) => {
         if (!live) return;
-        showError(err instanceof ApiError && err.status === 404
-          ? "That plan isn't in your saved plans."
-          : 'Your plan could not be loaded. Try again soon.');
+        const missing = err instanceof ApiError && err.status === 404;
+        setLoadFailure(missing
+          ? { message: "That plan isn't in your saved plans.", plansLink: true }
+          : { message: "Your plan didn't load.", retry: () => { setLoadFailure(null); navigate(`/?plan=${encodeURIComponent(planId)}`, { replace: true }); } });
         navigate('/', { replace: true });
       });
     return () => { live = false; };
-  }, [planId, member, loadSchedule, navigate, showError]);
+  }, [planId, member, loadSchedule, navigate]);
 
   useEffect(() => {
     const dataId = new URLSearchParams(window.location.search).get('activities');
@@ -85,12 +94,18 @@ function Planner({ me = null }) {
     const controller = new AbortController();
 
     async function loadActivities() {
+      setShareLoading(true);
+      setLoadFailure(null);
       try {
         const response = await fetch(
           `${apiUrl}/pause/activities/${encodeURIComponent(dataId)}`,
           { signal: controller.signal },
         );
 
+        if (response.status === 404) {
+          setLoadFailure({ message: "This shared plan doesn't exist. The link may be mistyped." });
+          return;
+        }
         if (!response.ok) {
           throw new Error(`Request failed with status ${response.status}`);
         }
@@ -103,14 +118,16 @@ function Planner({ me = null }) {
         );
       } catch (error) {
         if (error.name !== 'AbortError') {
-          showError('Your activities could not be loaded. Try again soon.');
+          setLoadFailure({ message: "The shared plan didn't load.", retry: () => setShareAttempt((n) => n + 1) });
         }
+      } finally {
+        if (!controller.signal.aborted) setShareLoading(false);
       }
     }
 
     loadActivities();
     return () => controller.abort();
-  }, [apiUrl, showError, loadSchedule, loadedShareId]);
+  }, [apiUrl, loadSchedule, loadedShareId, shareAttempt]);
 
   function setTimeUnit(event) {
     const timeUnit = event.target.value;
@@ -171,19 +188,31 @@ function Planner({ me = null }) {
     }));
   }
 
-  function replaceActivities(activities) {
+  function replaceActivities(activities, label) {
     const coloredActivities = addActivityColors(activities);
+    const applied = Object.fromEntries(
+      Object.keys(schedule.activities).map((id) => [
+        id,
+        coloredActivities.map((activity) => ({ ...activity })),
+      ]),
+    );
+    const hadActivities = Object.values(schedule.activities).some(
+      (day) => day.some(({ id }) => !['?', 0].includes(id)),
+    );
 
-    setSchedule((current) => ({
-      ...current,
-      activities: Object.fromEntries(
-        Object.keys(current.activities).map((id) => [
-          id,
-          coloredActivities.map((activity) => ({ ...activity })),
-        ]),
-      ),
-    }));
+    setUndo(hadActivities ? { label, previous: schedule.activities, applied } : null);
+    setSchedule((current) => ({ ...current, activities: applied }));
   }
+
+  function undoReplace() {
+    const { previous } = undo;
+    setUndo(null);
+    setSchedule((current) => ({ ...current, activities: previous }));
+  }
+
+  // Offered only while the replacement is exactly what's on screen: undoing
+  // after further edits would throw those edits away.
+  const canUndo = undo !== null && undo.applied === schedule.activities;
 
   async function postData() {
     setIsSaving(true);
@@ -245,9 +274,14 @@ function Planner({ me = null }) {
         link={modal.link}
         title={modal.title}
         note={modal.note}
-        onCloseModal={() => setModal((current) => ({ ...current, display: false }))}
+        onCloseModal={() => {
+          setModal((current) => ({ ...current, display: false }));
+          // Save was disabled while the dialog was up, so the dialog's own
+          // focus return had nowhere to land; put focus back once it's enabled.
+          requestAnimationFrame(() => document.getElementById('save')?.focus());
+        }}
       />
-      <div id="app-container">
+      <main id="app-container">
         <h1 id="title">
           <a href="." title="Pause" data-reload>Pause</a>
         </h1>
@@ -291,6 +325,14 @@ function Planner({ me = null }) {
           </div>
         )}
         {opening && <p className="pause-muted" role="status">Opening plan…</p>}
+        {shareLoading && <p className="pause-muted" role="status">Opening shared plan…</p>}
+        {loadFailure && (
+          <div className="pause-load-failure" role="alert">
+            <p className="pause-error">{loadFailure.message}</p>
+            {loadFailure.retry && <button type="button" className="pause-quiet" onClick={loadFailure.retry}>Try again</button>}
+            {loadFailure.plansLink && <a className="pause-link pause-tap" href="/plans">My plans</a>}
+          </div>
+        )}
         {currentPlan && (
           <p className="pause-plan-name">
             <span>{currentPlan.name}</span>
@@ -317,14 +359,23 @@ function Planner({ me = null }) {
             disabled={controlsDisabled}
             onButtonClick={replaceActivities}
           />
+          <p className="pause-undo" role="status">
+            {canUndo && (
+              <>
+                {undo.label}{' '}
+                <button type="button" className="pause-link" onClick={undoReplace}>Undo</button>
+              </>
+            )}
+          </p>
         </div>
         <div id="save-container">
           <button
             id="save"
             disabled={controlsDisabled}
             onClick={onSave}
+            aria-busy={isSaving}
           >
-            Save
+            {isSaving ? 'Saving…' : 'Save'}
           </button>
           {member && <a className="pause-quiet pause-my-plans" href="/plans">My plans</a>}
           {me?.state === 'guest' && (
@@ -348,7 +399,7 @@ function Planner({ me = null }) {
           }}
         />
         <Calculator activities={schedule.activities} />
-      </div>
+      </main>
     </>
   );
 }

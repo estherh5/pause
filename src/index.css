@@ -92,9 +92,11 @@ a:hover {
   color: #0edc00;
 }
 
-*:focus {
-  outline-color: #0edc00;
-  outline-width: 2px;
+/* Ink, not the accent green: #0edc00 is 1.9:1 on white, under the 3:1 a
+   focus indicator needs. Matches .pause-button's ring (DESIGN.md). */
+*:focus-visible {
+  outline: 2px solid var(--pause-ink);
+  outline-offset: 2px;
 }
 
 ::placeholder {

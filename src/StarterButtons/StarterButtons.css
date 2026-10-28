@@ -1,28 +1,47 @@
+/* Templates and Clear are secondary to Save: the quiet look (white fill, ink
+   text, rule border) keeps #save's green the one accent (DESIGN.md). */
 #button-container button {
   min-block-size: 44px;
   padding: 0 12px;
+  border: 1px solid var(--pause-rule);
   border-radius: 5px;
   margin: 5px;
-  box-shadow: 1px 1px 1px #b7b7b7;
-  visibility: visible;
-  background-color: #006ad0; /* white on it 5.3:1 */
+  box-shadow: 1px 1px 1px var(--pause-drop);
+  background-color: var(--pause-paper);
   font-size: 15px;
-  color: #ffffff;
+  color: var(--pause-ink);
 }
 
-#button-container button:hover, #button-container button:disabled {
-  background-color: #005fbf;
+#button-container button:hover {
+  background-color: var(--pause-wash);
 }
 
 #button-container button:active, #button-container button:disabled {
   box-shadow: none !important;
 }
 
-#clear {
-  background-color: #fd5858 !important;
-  color: #000000 !important;
+#button-container button:focus-visible {
+  outline: 2px solid var(--pause-ink);
+  outline-offset: 3px;
 }
 
-#clear:hover {
-  background-color: #ea4f4f !important;
+#button-container .pause-undo {
+  min-block-size: 44px;
+  margin: 4px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 15px;
+  color: var(--pause-muted);
+}
+
+#button-container .pause-undo button {
+  margin: 0;
+  padding: 0 8px;
+  border: none;
+  box-shadow: none;
+  background: none;
+  color: var(--pause-green-ink);
+  text-decoration: underline;
 }

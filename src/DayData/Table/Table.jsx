@@ -168,8 +168,14 @@ function Table({
             <Fragment key={activity.id}>
               <tr>
                 <td className="activity">
+                  {/* The chart's key: the same color as this row's slice. */}
+                  <span
+                    className="swatch"
+                    style={activity.color ? { backgroundColor: activity.color } : undefined}
+                    aria-hidden="true"
+                  />
                   {isRemaining ? (
-                    <div>{activity.label}</div>
+                    <div className="unplanned">{activity.label || 'Unplanned'}</div>
                   ) : (
                     <ActivityInput
                       key={`label-${inputKey}`}

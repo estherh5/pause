@@ -8,14 +8,19 @@ import { api } from '../lib/api.js';
 import '../components/admin.css';
 
 function Invitations() {
-  const { data: invites, isLoading, isError } = useQuery({ queryKey: ['invites'], queryFn: api.listInvites });
+  const { data: invites, isLoading, isError, isFetching, refetch } = useQuery({ queryKey: ['invites'], queryFn: api.listInvites });
   return (
     <section aria-labelledby="invitations-title">
       <h2 id="invitations-title" className="pause-section-title">Invitations</h2>
       <p className="pause-muted">Saved plans are by invitation. They get a link, sign in with Google, and access starts when they accept it.</p>
       <InviteComposer />
       {isLoading && <div className="pause-skeleton" aria-hidden="true" />}
-      {isError && <p className="pause-error">The invitations didn&apos;t load.</p>}
+      {isError && (
+        <div className="pause-access">
+          <p className="pause-error">The invitations didn&apos;t load.</p>
+          <button type="button" className="pause-quiet" aria-disabled={isFetching} onClick={() => !isFetching && refetch()}>{isFetching ? 'Trying…' : 'Try again'}</button>
+        </div>
+      )}
       {invites && invites.length === 0 && <p className="pause-muted">No invitations yet.</p>}
       {invites && invites.length > 0 && (
         <ul className="invite-list">

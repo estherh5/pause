@@ -115,12 +115,17 @@ FeedbackRow.propTypes = {
 };
 
 function Inbox() {
-  const { data: items, isLoading, isError } = useQuery({ queryKey: ['feedback-all'], queryFn: api.listAllFeedback });
+  const { data: items, isLoading, isError, isFetching, refetch } = useQuery({ queryKey: ['feedback-all'], queryFn: api.listAllFeedback });
   return (
     <>
       <p><a className="pause-link pause-tap" href="/settings">Settings</a></p>
       {isLoading && <div className="pause-skeleton" aria-hidden="true" />}
-      {isError && <p className="pause-error">Couldn&apos;t load feedback.</p>}
+      {isError && (
+        <div className="pause-access">
+          <p className="pause-error">Couldn&apos;t load feedback.</p>
+          <button type="button" className="pause-quiet" aria-disabled={isFetching} onClick={() => !isFetching && refetch()}>{isFetching ? 'Trying…' : 'Try again'}</button>
+        </div>
+      )}
       {items && items.length === 0 && <p className="pause-muted">No feedback yet.</p>}
       {items && items.length > 0 && <ul className="fb-admin-list">{items.map((item) => <FeedbackRow key={item.id} item={item} />)}</ul>}
     </>

@@ -1,4 +1,5 @@
 import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { jsonResponse, renderApp } from '../test/render.jsx';
 
@@ -64,5 +65,19 @@ describe('/stats', () => {
     const { calls } = renderApp({ route: '/stats', me: { state: 'guest', email: 'g@example.com' } });
     expect(await screen.findByText("Saved plans are by invitation. g@example.com doesn't have one.")).toBeInTheDocument();
     expect(calls.some((c) => c.path.startsWith('/api/stats'))).toBe(false);
+  });
+
+  it('/api/me failing shows Try again instead of a blank page, and recovers', async () => {
+    let up = false;
+    renderApp({
+      route: '/stats',
+      routes: {
+        '/api/me': () => (up ? jsonResponse({ state: 'signed-out' }) : jsonResponse({ error: 'down' }, 500)),
+      },
+    });
+    expect(await screen.findByText("Couldn't reach Pause.")).toBeInTheDocument();
+    up = true;
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText('Sign in to keep plans by name.')).toBeInTheDocument();
   });
 });

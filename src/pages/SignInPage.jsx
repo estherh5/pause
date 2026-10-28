@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { Navigate, useSearchParams } from 'react-router-dom';
+import BackLink from '../components/BackLink.jsx';
 import SignInButton from '../components/SignInButton.jsx';
 import './AuthPages.css';
 
@@ -11,6 +12,7 @@ export default function SignInPage({ me }) {
   if (me && me.state !== 'signed-out') return <Navigate to="/plans" replace />;
   return (
     <main className="pause-auth">
+      <BackLink />
       <h1 className="pause-auth-title">Pause</h1>
       <p>Sign in to save plans by name.</p>
       <SignInButton next={safeNext(params.get('next'))} />

@@ -69,7 +69,7 @@ describe('App', () => {
   it('shows calculator totals for a selected age range', async () => {
     const user = userEvent.setup();
     renderApp();
-    await user.click(screen.getByTitle('Professional activities'));
+    await user.click(screen.getByTitle('Replace with professional activities'));
 
     fireEvent.blur(screen.getByTitle('Enter your age'), {
       target: { value: '30' },
@@ -137,5 +137,38 @@ describe('Planner share loading across remounts', () => {
     await user.click(screen.getByText('toggle'));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(fetchMock.mock.calls[1][0]).toBe('/api/pause/activities/xyz');
+  });
+
+  it('a starter over a filled plan can be undone, and only while untouched', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    await user.click(screen.getByTitle('Replace with professional activities'));
+    expect(screen.queryByRole('button', { name: 'Undo' })).not.toBeInTheDocument(); // nothing was lost
+    await user.click(screen.getByTitle('Clear all activities'));
+    expect(screen.queryByDisplayValue('work')).not.toBeInTheDocument();
+    expect(screen.getByText('Cleared.')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Undo' }));
+    expect(screen.getByDisplayValue('work')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Undo' })).not.toBeInTheDocument();
+  });
+
+  it('a share link that fails to load says so in place, with Try again', async () => {
+    const user = userEvent.setup();
+    let up = false;
+    window.history.replaceState(null, '', '/?activities=abc');
+    renderApp({
+      route: '/?activities=abc',
+      routes: {
+        '/api/pause/activities/abc': () => (up
+          ? jsonResponse({ activities: { 0: [{ id: 0, value: 16, label: '' }, { id: 1, value: 8, label: 'nap' }, { id: '?', value: '', label: '' }] }, chart_types: { 0: 'pie' }, time_unit: 'day', month: null, year: null })
+          : jsonResponse({ error: 'down' }, 500)),
+      },
+    });
+    expect(await screen.findByText("The shared plan didn't load.")).toBeInTheDocument();
+    up = true;
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByDisplayValue('nap')).toBeInTheDocument();
+    expect(screen.queryByText("The shared plan didn't load.")).not.toBeInTheDocument();
+    window.history.replaceState(null, '', '/');
   });
 });

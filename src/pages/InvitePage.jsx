@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import BackLink from '../components/BackLink.jsx';
 import SignInButton from '../components/SignInButton.jsx';
 import { ApiError, api } from '../lib/api.js';
 import { useMe } from '../lib/queries.js';
@@ -9,6 +10,7 @@ import './AuthPages.css';
 
 const Shell = ({ children }) => (
   <main className="pause-auth">
+    <BackLink />
     <h1 className="pause-auth-title">Pause</h1>
     {children}
   </main>
@@ -32,6 +34,7 @@ export default function InvitePage({ me }) {
   // Why the last Accept didn't land: 'expired' (401) or 'unreachable' (network/5xx).
   const [acceptFailure, setAcceptFailure] = useState(null);
   const inFlight = useRef(false);
+  const [lookup, setLookup] = useState(0); // bumped by Try again after a failed lookup
   // Same ['me'] query App reads, so this adds no fetch; App only passes the data.
   const { isError: meFailed, refetch: retryMe, isFetching: meFetching } = useMe();
 
@@ -39,9 +42,14 @@ export default function InvitePage({ me }) {
     let live = true;
     api.resolveInvite(token)
       .then((view) => live && setResolved({ token, view }))
-      .catch(() => live && setResolved({ token, view: { state: 'invalid' } }));
+      // Only the server can call a link dead. A network failure or a 5xx says
+      // nothing about the link, so it gets a Try again, as accept() already does.
+      .catch((e) => live && setResolved({
+        token,
+        view: { state: e instanceof ApiError && e.status < 500 ? 'invalid' : 'unreachable' },
+      }));
     return () => { live = false; };
-  }, [token]);
+  }, [token, lookup]);
 
   if (!me && meFailed) {
     return (
@@ -52,6 +60,14 @@ export default function InvitePage({ me }) {
     );
   }
   if (!view || !me) return <Shell><p role="status" className="pause-muted">Opening the invitation</p></Shell>;
+  if (view.state === 'unreachable') {
+    return (
+      <Shell>
+        <p role="alert" className="pause-error">Couldn&apos;t reach Pause.</p>
+        <button type="button" className="pause-button" onClick={() => { setResolved(null); setLookup((n) => n + 1); }}>Try again</button>
+      </Shell>
+    );
+  }
   if (view.state !== 'valid') return <Invalid />;
 
   if (outcome?.ok) {
@@ -106,7 +122,7 @@ export default function InvitePage({ me }) {
       {me.state === 'signed-out' || acceptFailure === 'expired' ? (
         <SignInButton next={`/invite/${token}`} />
       ) : (
-        <button type="button" className="pause-button" aria-disabled={pending} onClick={accept}>Accept</button>
+        <button type="button" className="pause-button" aria-disabled={pending} onClick={accept}>{pending ? 'Accepting…' : 'Accept'}</button>
       )}
     </Shell>
   );

@@ -33,6 +33,7 @@ ChartJS.register(
 ChartJS.defaults.font.family = 'Raleway';
 
 const CHART_TYPES = ['Pie', 'Bar', 'Radar', 'Doughnut'];
+const type = (t) => CHART_TYPES.find((c) => c.toLowerCase() === t) ?? 'Pie';
 const CHART_COMPONENTS = {
   bar: Bar,
   doughnut: Doughnut,
@@ -104,6 +105,11 @@ function Chart({
   }
 
   const ChartComponent = CHART_COMPONENTS[chartType] ?? Pie;
+  const chartLabel = chartActivities.length === 0
+    ? `${type(chartType)} chart: nothing planned yet`
+    : `${type(chartType)} chart: ${chartActivities
+      .map((a) => `${a.label || 'unplanned'} ${a.value} ${Number(a.value) === 1 ? 'hour' : 'hours'}`)
+      .join(', ')}`;
 
   return (
     <div className={`chart-container ${timeUnit}`}>
@@ -126,6 +132,7 @@ function Chart({
               }`}
               onClick={() => onChartTypeChange(id, normalizedType)}
               title={`${type} chart`}
+              aria-label={`${type} chart`}
               aria-pressed={normalizedType === chartType}
             >
               <i className={iconClass} aria-hidden="true">
@@ -140,7 +147,11 @@ function Chart({
         })}
       </div>
       <div className={`chart-visual-container ${timeUnit}`}>
-        <ChartComponent data={data} options={options} />
+        <ChartComponent
+          data={data}
+          options={options}
+          aria-label={chartLabel}
+        />
       </div>
     </div>
   );
