@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   MONTHS,
   addActivityColors,
+  planPalette,
   createPeriodState,
   getDaysInMonth,
 } from '../activities.js';
@@ -173,7 +174,8 @@ function Planner({ me = null }) {
       ...current,
       activities: {
         ...current.activities,
-        [componentId]: addActivityColors(activities),
+        // Other days first, so this day takes the plan's colors for its labels.
+        [componentId]: addActivityColors(activities, planPalette({ ...current.activities, [componentId]: [] })),
       },
     }));
   }
