@@ -112,7 +112,7 @@
   align-items: center;
 }
 
-.pause-guest-note {
+.pause-guest-note, #save-container .pause-access {
   flex-basis: 100%;
   margin: 4px 16px 0;
   font-size: 14px;
@@ -164,6 +164,7 @@
 
   #button-container {
     margin-top: 60px;
+    flex-wrap: wrap;
     -webkit-box-orient: horizontal;
     -webkit-box-direction: normal;
     -webkit-flex-direction: row;

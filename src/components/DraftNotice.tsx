@@ -123,7 +123,7 @@ export default function DraftNotice({
       {present ? (
         <div className="draft-notice">
           <p className="draft-notice-text">
-            {restored ? "kept what you had written" : "unsaved changes"}
+            {restored ? "Kept what you had written" : "Unsaved changes"}
             {" · "}
             <time dateTime={new Date(draft.at).toISOString()} suppressHydrationWarning>
               {ago(draft.at)}

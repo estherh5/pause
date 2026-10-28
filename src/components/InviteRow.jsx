@@ -31,7 +31,7 @@ function errorText(err) {
 
 /** Keyed by the server's `statusOf` union (lib/invite-status.ts). */
 const STATUS_LABEL = { invited: 'Invited', accepted: 'Accepted', expired: 'Expired', revoked: 'Revoked', removed: 'Removed' };
-const when = (ms) => new Date(ms).toLocaleDateString();
+const when = (ms) => new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
 /**
  * One invitation in the owner's list (DESIGN.md "Removing a member").

@@ -65,6 +65,8 @@ describe('/stats', () => {
     const { calls } = renderApp({ route: '/stats', me: { state: 'guest', email: 'g@example.com' } });
     expect(await screen.findByText("Saved plans are by invitation. g@example.com doesn't have one.")).toBeInTheDocument();
     expect(calls.some((c) => c.path.startsWith('/api/stats'))).toBe(false);
+    // Not a dead end: the planner works without an invitation.
+    expect(screen.getByRole('link', { name: 'Plan without saving' })).toHaveAttribute('href', '/');
   });
 
   it('/api/me failing shows Try again instead of a blank page, and recovers', async () => {

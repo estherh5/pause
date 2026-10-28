@@ -106,8 +106,8 @@ describe('/plans', () => {
   it('New plan with unsaved changes asks first; Keep editing keeps them', async () => {
     const user = userEvent.setup();
     renderApp({ route: '/', me: member, routes: { '/api/plans': () => jsonResponse([]) } });
-    await user.type(await screen.findByTitle('activity'), 'sleep');
-    await user.type(screen.getByTitle('hours'), '8');
+    await user.type(await screen.findByRole('textbox', { name: 'New activity' }), 'sleep');
+    await user.type(screen.getByRole('spinbutton', { name: 'Hours for the new activity' }), '8');
     await user.click(screen.getByTitle('Add activity'));
     await user.click(screen.getByRole('link', { name: 'My plans' }));
     await user.click(await screen.findByRole('button', { name: '+ New plan' }));
@@ -119,8 +119,8 @@ describe('/plans', () => {
 
   async function dirtyThenPlans(user) {
     renderApp({ route: '/', me: member, routes: { '/api/plans': () => jsonResponse([row('a', 'Week one')]) } });
-    await user.type(await screen.findByTitle('activity'), 'sleep');
-    await user.type(screen.getByTitle('hours'), '8');
+    await user.type(await screen.findByRole('textbox', { name: 'New activity' }), 'sleep');
+    await user.type(screen.getByRole('spinbutton', { name: 'Hours for the new activity' }), '8');
     await user.click(screen.getByTitle('Add activity'));
     await user.click(screen.getByRole('link', { name: 'My plans' }));
   }
@@ -149,14 +149,14 @@ describe('/plans', () => {
     renderApp({ route: '/plans', me: member, routes: { '/api/plans': () => jsonResponse([]) } });
     await user.click(await screen.findByRole('button', { name: '+ New plan' }));
     expect(screen.queryByRole('dialog')).toBeNull();
-    expect(await screen.findByTitle('activity')).toBeInTheDocument();
+    expect(await screen.findByRole('textbox', { name: 'New activity' })).toBeInTheDocument();
   });
   it('New plan, confirmed, clears the planner', async () => {
     const user = userEvent.setup();
     await dirtyThenPlans(user);
     await user.click(await screen.findByRole('button', { name: '+ New plan' }));
     await user.click(screen.getByRole('button', { name: 'Start new' }));
-    expect(await screen.findByTitle('activity')).toBeInTheDocument();
+    expect(await screen.findByRole('textbox', { name: 'New activity' })).toBeInTheDocument();
     expect(screen.queryByDisplayValue('sleep')).toBeNull();
   });
 

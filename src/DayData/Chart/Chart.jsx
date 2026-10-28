@@ -34,6 +34,11 @@ ChartJS.defaults.font.family = 'Raleway';
 
 const CHART_TYPES = ['Pie', 'Bar', 'Radar', 'Doughnut'];
 const type = (t) => CHART_TYPES.find((c) => c.toLowerCase() === t) ?? 'Pie';
+// Axis and spoke labels share a narrow canvas with six other names; the tooltip
+// carries the full one.
+const shortLabel = (label) => (label.length > 10 ? `${label.slice(0, 9)}…` : label);
+const TICK_FONT = { size: 11 };
+
 const CHART_COMPONENTS = {
   bar: Bar,
   doughnut: Doughnut,
@@ -99,11 +104,23 @@ function Chart({
   if (chartType === 'bar') {
     options.scales = {
       y: { beginAtZero: true, max: maxValue },
-      x: { ticks: { autoSkip: false } },
+      x: {
+        ticks: {
+          autoSkip: false,
+          font: TICK_FONT,
+          callback(value) { return shortLabel(this.getLabelForValue(value)); },
+        },
+      },
     };
   } else if (isRadar) {
     options.scales = {
-      r: { beginAtZero: true, max: maxValue },
+      r: {
+        beginAtZero: true,
+        max: maxValue,
+        // Five rings of numbers collide with the spoke labels in a 250px chart.
+        ticks: { maxTicksLimit: 4, font: TICK_FONT, backdropColor: 'transparent' },
+        pointLabels: { font: TICK_FONT, callback: shortLabel },
+      },
     };
   }
 

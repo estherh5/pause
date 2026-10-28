@@ -40,7 +40,7 @@ describe('planner drafts', () => {
 
     renderApp();
     expect(timeUnit()).toHaveTextContent('week');
-    expect(screen.getByText(/kept what you had written/)).toBeInTheDocument();
+    expect(screen.getByText(/Kept what you had written/)).toBeInTheDocument();
   });
 
   it('a share link shows its own plan and only offers the draft', async () => {
@@ -61,7 +61,7 @@ describe('planner drafts', () => {
     const { calls } = renderApp({ route: '/?activities=abc', routes: { '/api/pause/activities/abc': () => jsonResponse(share) } });
     await waitFor(() => expect(calls.some((c) => c.path === '/api/pause/activities/abc')).toBe(true));
     expect(timeUnit()).toHaveTextContent('day');
-    expect(screen.queryByText(/kept what you had written/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Kept what you had written/)).not.toBeInTheDocument();
   });
 
   it('while a link is still loading, the blank-start draft stays put', async () => {
@@ -70,7 +70,7 @@ describe('planner drafts', () => {
     const { calls } = renderApp({ route: '/?activities=abc', routes: { '/api/pause/activities/abc': () => new Promise(() => {}) } });
     await waitFor(() => expect(calls.some((c) => c.path === '/api/pause/activities/abc')).toBe(true));
     expect(timeUnit()).toHaveTextContent('day');
-    expect(screen.queryByText(/kept what you had written/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Kept what you had written/)).not.toBeInTheDocument();
     expect(stored('plan:new')).not.toBeNull();
   });
 

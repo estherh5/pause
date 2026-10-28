@@ -28,4 +28,4 @@ Page titles on new routes: `Satisfy` 40px, centered, like `#title` at a smaller 
 
 ## Faces
 
-Satisfy (wordmark, page titles, the most-planned figure), Raleway (everything else). Rajdhani is loaded but unused.
+Satisfy (wordmark, page titles, the most-planned figure), Raleway (everything else).

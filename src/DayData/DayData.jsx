@@ -1,8 +1,11 @@
+import { Suspense, lazy } from 'react';
 import PropTypes from 'prop-types';
 import { activityPropType } from '../propTypes.js';
 import './DayData.css';
-import Chart from './Chart/Chart.jsx';
 import Table from './Table/Table.jsx';
+
+// Chart.js is most of the bundle; the table is usable before it arrives.
+const Chart = lazy(() => import('./Chart/Chart.jsx'));
 
 const WEEKDAYS = [
   'Sunday',
@@ -167,13 +170,25 @@ function DayData({
           onAddActivity={addActivity}
           onDeleteActivity={removeActivity}
         />
-        <Chart
-          id={id}
-          timeUnit={timeUnit}
-          activities={activities}
-          chartType={chartType}
-          onChartTypeChange={onChartTypeEdit}
-        />
+        <Suspense
+          fallback={(
+            // Holds the chart's footprint so nothing moves when it lands.
+            <div className={`chart-container ${timeUnit}`} aria-hidden="true">
+              <div className={`chart-button-container ${timeUnit}`}>
+                <span className="chart-button-slot" />
+              </div>
+              <div className={`chart-visual-container ${timeUnit}`} />
+            </div>
+          )}
+        >
+          <Chart
+            id={id}
+            timeUnit={timeUnit}
+            activities={activities}
+            chartType={chartType}
+            onChartTypeChange={onChartTypeEdit}
+          />
+        </Suspense>
       </div>
     </div>
   );

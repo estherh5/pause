@@ -114,15 +114,15 @@ tr:hover td .delete, tr:focus-within td .delete {
   }
 
   table.week .activity, table.month .activity {
-    width: 112px;
+    width: 137px;
   }
 
   table.week .unplanned, table.month .unplanned {
-    inline-size: 95px;
+    inline-size: 120px;
   }
 
   table.week .activity input, table.month .activity input {
-    width: 95px;
+    width: 120px;
   }
 
   table.week .hours, table.month .hours {

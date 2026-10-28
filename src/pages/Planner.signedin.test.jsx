@@ -29,8 +29,8 @@ describe('planner when signed in', () => {
     renderApp({ route: '/?plan=p1', me: { state: 'member', email: 'm@example.com', name: null }, routes: { '/api/plans/p1': () => jsonResponse(plan) } });
     expect(await screen.findByText('Week')).toBeInTheDocument();
     expect(screen.getByDisplayValue('sleep')).toBeInTheDocument();
-    await user.type(screen.getAllByTitle('activity').at(-1), 'walk');
-    await user.type(screen.getAllByTitle('hours').at(-1), '1');
+    await user.type(screen.getAllByRole('textbox', { name: 'New activity' }).at(-1), 'walk');
+    await user.type(screen.getAllByRole('spinbutton', { name: 'Hours for the new activity' }).at(-1), '1');
     await user.click(screen.getByTitle('Add activity'));
     expect(screen.getByText('· unsaved changes')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Save' }));

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -25,7 +25,7 @@ describe('App', () => {
 
     expect(screen.getByText('Sunday')).toBeInTheDocument();
     expect(screen.getByText('Saturday')).toBeInTheDocument();
-    expect(screen.getAllByTestId('chart')).toHaveLength(7);
+    expect(await screen.findAllByTestId('chart')).toHaveLength(7);
   });
 
   it('the time unit control is keyboard-operable', async () => {
@@ -44,8 +44,8 @@ describe('App', () => {
     const user = userEvent.setup();
     renderApp();
 
-    await user.type(screen.getByTitle('activity'), 'sleep');
-    await user.type(screen.getByTitle('hours'), '8');
+    await user.type(screen.getByRole('textbox', { name: 'New activity' }), 'sleep');
+    await user.type(screen.getByRole('spinbutton', { name: 'Hours for the new activity' }), '8');
     await user.click(screen.getByTitle('Add activity'));
 
     expect(screen.getAllByDisplayValue('sleep')).toHaveLength(1);
@@ -57,8 +57,8 @@ describe('App', () => {
     const user = userEvent.setup();
     renderApp();
 
-    await user.type(screen.getByTitle('activity'), 'sleep');
-    await user.type(screen.getByTitle('hours'), '25');
+    await user.type(screen.getByRole('textbox', { name: 'New activity' }), 'sleep');
+    await user.type(screen.getByRole('spinbutton', { name: 'Hours for the new activity' }), '25');
     await user.click(screen.getByTitle('Add activity'));
 
     expect(
@@ -170,5 +170,27 @@ describe('Planner share loading across remounts', () => {
     expect(await screen.findByDisplayValue('nap')).toBeInTheDocument();
     expect(screen.queryByText("The shared plan didn't load.")).not.toBeInTheDocument();
     window.history.replaceState(null, '', '/');
+  });
+
+  it('says so when /api/me fails, instead of looking signed out', async () => {
+    const user = userEvent.setup();
+    let up = false;
+    const { calls } = renderApp({ routes: { '/api/me': () => (up ? jsonResponse({ state: 'signed-out' }) : jsonResponse({}, 500)) } });
+    expect(await screen.findByText("Couldn't reach Pause.")).toHaveAttribute('role', 'alert');
+    up = true;
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    await waitFor(() => expect(screen.queryByText("Couldn't reach Pause.")).not.toBeInTheDocument());
+    // Exactly one failed load and one retry: the message must not refetch on its own.
+    expect(calls.filter((c) => c.path === '/api/me')).toHaveLength(2);
+  });
+
+  it('the saved dialog says who can see the link, and Done closes it', async () => {
+    const user = userEvent.setup();
+    renderApp({ routes: { '/api/pause/activities': () => jsonResponse('abc123') } });
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Saved' });
+    expect(dialog).toHaveTextContent('Anyone with the link can view this plan.');
+    await user.click(within(dialog).getByRole('button', { name: 'Done' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

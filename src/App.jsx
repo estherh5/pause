@@ -20,7 +20,7 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx'));
 const AdminFeedbackPage = lazy(() => import('./pages/AdminFeedbackPage.jsx'));
 
 function App() {
-  const { data: me = null } = useMe();
+  const { data: me = null, isError: meFailed, refetch: retryMe } = useMe();
   const navigate = useNavigate();
   useEffect(() => interceptInternalLinks(navigate), [navigate]);
 
@@ -31,7 +31,7 @@ function App() {
         <Header me={me} />
         <Suspense fallback={null}>
           <Routes>
-            <Route path="/" element={<Planner me={me} />} />
+            <Route path="/" element={<Planner me={me} onRetryMe={meFailed ? retryMe : null} />} />
             <Route path="/plans" element={<PlansPage me={me} />} />
             <Route path="/stats" element={<StatsPage me={me} />} />
             <Route path="/signin" element={<SignInPage me={me} />} />

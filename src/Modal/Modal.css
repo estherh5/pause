@@ -53,8 +53,9 @@
   font-weight: normal;
 }
 
-.success {
-  color: var(--pause-green-ink);
+/* Green stays the one accent on the page (the Done button); the heading is ink. */
+.modal-header.success {
+  color: var(--pause-ink);
 }
 
 .fail {
@@ -130,4 +131,9 @@
   margin: 10px 0 0;
   font-size: 14px;
   color: var(--pause-muted);
+}
+
+.modal-done {
+  margin-top: 20px;
+  min-inline-size: 96px;
 }

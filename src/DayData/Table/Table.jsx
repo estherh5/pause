@@ -184,6 +184,7 @@ function Table({
                       className={inputClass}
                       type="text"
                       placeholder="activity"
+                      label={isNew ? 'New activity' : 'Activity name'}
                       value={activity.label}
                       inputRef={isNew ? newLabelRef : undefined}
                       onBlur={editLabel}
@@ -202,6 +203,7 @@ function Table({
                       className={inputClass}
                       type="number"
                       placeholder="hours"
+                      label={isNew ? 'Hours for the new activity' : `Hours for ${activity.label}`}
                       min="0.25"
                       max="24"
                       step="0.25"

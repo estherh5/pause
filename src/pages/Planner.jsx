@@ -10,6 +10,7 @@ import {
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { API_BASE, api, ApiError } from '../lib/api.js';
 import { isMember } from '../lib/queries.js';
+import { MeError } from '../components/MeStatus.jsx';
 import DraftNotice from '../components/DraftNotice';
 import SavePlanDialog from '../components/SavePlanDialog.jsx';
 import { usePlanner } from '../lib/planner-context.jsx';
@@ -20,7 +21,7 @@ import DayData from '../DayData/DayData.jsx';
 import Modal from '../Modal/Modal.jsx';
 import StarterButtons from '../StarterButtons/StarterButtons.jsx';
 
-function Planner({ me = null }) {
+function Planner({ me = null, onRetryMe = null }) {
   const { schedule, setSchedule, loadSchedule, loadedShareId, currentPlan, isDirty, draft } = usePlanner();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -381,6 +382,10 @@ function Planner({ me = null }) {
             {isSaving ? 'Saving…' : 'Save'}
           </button>
           {member && <a className="pause-quiet pause-my-plans" href="/plans">My plans</a>}
+          {/* Without this an owner whose /api/me failed looks signed out, with no way to retry.
+              App owns the query: a second observer mounted here only on error would
+              refetch on mount, reset the query to pending, unmount, and loop. */}
+          {onRetryMe && !me && <MeError onRetry={onRetryMe} />}
           {me?.state === 'guest' && (
             <p className="pause-muted pause-guest-note">{`Saved plans are by invitation. ${me.email} doesn't have one.`}</p>
           )}
@@ -407,6 +412,9 @@ function Planner({ me = null }) {
   );
 }
 
-Planner.propTypes = { me: PropTypes.shape({ state: PropTypes.string, email: PropTypes.string }) };
+Planner.propTypes = {
+  me: PropTypes.shape({ state: PropTypes.string, email: PropTypes.string }),
+  onRetryMe: PropTypes.func,
+};
 
 export default Planner;

@@ -67,7 +67,11 @@ function Modal({ display, status, message, link, title, note, onCloseModal }) {
             </button>
           </div>
         )}
+        {link && <p className="modal-note">Anyone with the link can view this plan.</p>}
         {note && <p className="modal-note">{note}</p>}
+        {status === 'success' && (
+          <button type="button" className="pause-button modal-done" onClick={onCloseModal}>Done</button>
+        )}
       </div>
     </dialog>
   );

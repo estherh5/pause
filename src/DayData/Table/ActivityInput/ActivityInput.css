@@ -4,6 +4,7 @@ input {
   font-family: 'Raleway', sans-serif;
   font-size: 14px;
   text-align: center;
+  text-overflow: ellipsis;
 }
 
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {

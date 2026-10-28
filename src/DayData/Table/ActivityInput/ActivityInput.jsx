@@ -7,6 +7,7 @@ function ActivityInput({
   className,
   type,
   placeholder,
+  label,
   min,
   max,
   step,
@@ -46,7 +47,9 @@ function ActivityInput({
       data-id={dataId}
       type={type}
       placeholder={placeholder}
-      title={placeholder}
+      aria-label={label}
+      // A long name clips in the narrow week and month columns; hovering shows all of it.
+      title={value === '' ? undefined : String(value)}
       min={min}
       max={max}
       step={step}
@@ -65,6 +68,7 @@ ActivityInput.propTypes = {
   className: PropTypes.string.isRequired,
   type: PropTypes.oneOf(['text', 'number']).isRequired,
   placeholder: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
   min: PropTypes.string,
   max: PropTypes.string,
   step: PropTypes.string,

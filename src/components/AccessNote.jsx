@@ -11,7 +11,14 @@ export default function AccessNote({ me, next }) {
       </div>
     );
   }
-  if (me?.state === 'guest') return <p className="pause-access">{`Saved plans are by invitation. ${me.email} doesn't have one.`}</p>;
+  if (me?.state === 'guest') {
+    return (
+      <div className="pause-access">
+        <p>{`Saved plans are by invitation. ${me.email} doesn't have one.`}</p>
+        <a className="pause-link pause-tap" href="/">Plan without saving</a>
+      </div>
+    );
+  }
   return null;
 }
 AccessNote.propTypes = { me: PropTypes.shape({ state: PropTypes.string, email: PropTypes.string }), next: PropTypes.string };

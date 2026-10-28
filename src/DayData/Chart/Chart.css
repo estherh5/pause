@@ -29,6 +29,10 @@
   color: var(--pause-muted); /* 7.0:1; the old #dcdcdc was 1.4:1 */
 }
 
+.chart-button-slot {
+  block-size: 44px;
+}
+
 .chart-button:hover {
   color: var(--pause-ink);
 }
@@ -50,11 +54,6 @@
   position: relative;
   height: 300px;
   width: 300px;
-}
-
-.chart-visual-container.week, .chart-visual-container.month {
-  height: 250px;
-  width: 250px;
 }
 
 @media only screen and (min-width: 630px) {
