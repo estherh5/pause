@@ -14,10 +14,10 @@ function Invitations() {
       <h2 id="invitations-title" className="pause-section-title">Invitations</h2>
       <p className="pause-muted">Saved plans are by invitation. They get a link, sign in with Google, and access starts when they accept it.</p>
       <InviteComposer />
-      {isLoading && <div className="pause-skeleton" aria-hidden="true" />}
+      {isLoading && <div className="pause-skeleton" role="status" aria-busy="true" aria-label="Loading invitations" />}
       {isError && (
         <div className="pause-access">
-          <p className="pause-error">The invitations didn&apos;t load.</p>
+          <p role="alert" className="pause-error">The invitations didn&apos;t load.</p>
           <button type="button" className="pause-quiet" aria-disabled={isFetching} onClick={() => !isFetching && refetch()}>{isFetching ? 'Trying…' : 'Try again'}</button>
         </div>
       )}

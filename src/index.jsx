@@ -7,7 +7,9 @@ import { FlareBoundary } from './components/FlareBoundary.jsx';
 import { FleetFooter } from './components/FleetFooter';
 import './index.css';
 
-const queryClient = new QueryClient();
+// One retry, not three with backoff: a failed load otherwise sits on its
+// skeleton for 7-8s before the error and Try again appear.
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1 } } });
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

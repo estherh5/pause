@@ -6,7 +6,8 @@ function emailMarkFor(status) {
   if (status === 'sent') return { text: '✓ Sent', className: '' };
   if (status === 'failed') return { text: '✗ Failed', className: 'failed' };
   if (status === 'skipped') return { text: '— Skipped', className: '' };
-  return { text: 'pre-tracking', className: 'pretracking' };
+  // Sent before Pause recorded email delivery, so there is nothing to show.
+  return { text: 'Not recorded', className: 'pretracking' };
 }
 
 function Bubble({ side, label, body, createdAt, mark, viaEmail }) {

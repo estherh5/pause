@@ -41,7 +41,7 @@ function Planner({ me = null }) {
   const [isSaving, setIsSaving] = useState(false);
   // A failed ?plan= or ?activities= load stays in the status slot with its own
   // Try again, instead of a modal that can only be closed.
-  const [loadFailure, setLoadFailure] = useState(null); // { message, retry?, plansLink? }
+  const [loadFailure, setLoadFailure] = useState(null); // { message, retry?, plansLink?, newPlanLink? }
   const [shareLoading, setShareLoading] = useState(false);
   const [shareAttempt, setShareAttempt] = useState(0);
   // The schedule a starter or Clear replaced, kept while the replacement is untouched.
@@ -103,7 +103,7 @@ function Planner({ me = null }) {
         );
 
         if (response.status === 404) {
-          setLoadFailure({ message: "This shared plan doesn't exist. The link may be mistyped." });
+          setLoadFailure({ message: "This shared plan doesn't exist. The link may be mistyped.", newPlanLink: true });
           return;
         }
         if (!response.ok) {
@@ -331,6 +331,7 @@ function Planner({ me = null }) {
             <p className="pause-error">{loadFailure.message}</p>
             {loadFailure.retry && <button type="button" className="pause-quiet" onClick={loadFailure.retry}>Try again</button>}
             {loadFailure.plansLink && <a className="pause-link pause-tap" href="/plans">My plans</a>}
+            {loadFailure.newPlanLink && <a className="pause-link pause-tap" href="/">Start a new plan</a>}
           </div>
         )}
         {currentPlan && (

@@ -20,7 +20,7 @@ input:focus::-webkit-inner-spin-button {
 }
 
 .new {
-  border-color: #dcdcdc;
+  border-color: var(--pause-rule);
   border-style: solid;
   border-width: 1px;
 }

@@ -47,7 +47,7 @@ export default function StatsPage({ me }) {
   else if (q.isPending) body = <div aria-busy="true">{[0, 1, 2].map((i) => <div key={i} className="pause-skeleton stat-skeleton" />)}</div>;
   else if (q.isError) body = (
     <div className="pause-access">
-      <p>{"Stats didn't load."}</p>
+      <p role="alert" className="pause-error">{"Stats didn't load."}</p>
       <button type="button" className="pause-quiet" onClick={() => q.refetch()}>Try again</button>
     </div>
   );

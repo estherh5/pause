@@ -4,12 +4,18 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import InviteComposer from './InviteComposer.jsx';
 import { jsonResponse, renderApp } from '../test/render.jsx';
+import { statusOf } from '../../lib/invite-status.ts';
 
 vi.mock('react-chartjs-2', () => ({ Bar: () => null, Doughnut: () => null, Pie: () => null, Radar: () => null }));
 
 const owner = { state: 'owner', email: 'hoffman.esther@gmail.com', name: null };
 // The owner's list never carries a token (api/access.ts#toAdminRow).
-const row = (over) => ({ id: 'i1', email: 'a@example.com', note: null, invitedBy: owner.email, createdAt: 1, expiresAt: 2, acceptedAt: null, revokedAt: null, emailStatus: 'sent', status: 'pending', ...over });
+// Status from the server's own statusOf, never hand-typed (see InviteRow.test.jsx).
+const NOW = 1_000;
+const row = (over) => {
+  const r = { id: 'i1', email: 'a@example.com', note: null, invitedBy: owner.email, createdAt: 1, expiresAt: NOW + 10, acceptedAt: null, revokedAt: null, emailStatus: 'sent', ...over };
+  return { ...r, status: statusOf(r, NOW) };
+};
 
 function mount() {
   const calls = [];
@@ -82,8 +88,8 @@ describe('InviteComposer', () => {
 describe('Settings invite list', () => {
   it('renders email, status pill and actions from a list with no token field', async () => {
     const list = [
-      row({ id: 'i1', email: 'pending@example.com', status: 'pending' }),
-      row({ id: 'i2', email: 'in@example.com', status: 'accepted', acceptedAt: 5 }),
+      row({ id: 'i1', email: 'pending@example.com' }),
+      row({ id: 'i2', email: 'in@example.com', acceptedAt: 5 }),
     ];
     expect(JSON.stringify(list)).not.toContain('token');
     renderApp({ route: '/settings', me: owner, routes: { '/api/access': () => jsonResponse(list) } });

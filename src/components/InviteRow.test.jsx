@@ -5,7 +5,16 @@ import { describe, expect, it, vi } from 'vitest';
 import InviteRow from './InviteRow.jsx';
 import { jsonResponse } from '../test/render.jsx';
 
-const inv = (over) => ({ id: 'i1', email: 'a@example.com', note: null, invitedBy: 'o@example.com', createdAt: 1, expiresAt: 2, acceptedAt: null, revokedAt: null, emailStatus: 'sent', status: 'pending', ...over });
+import { statusOf } from '../../lib/invite-status.ts';
+
+// Status comes from the server's own statusOf over the timestamps, never typed
+// by hand: a hand-typed 'pending' once kept this suite green while every real
+// pending row rendered an empty pill and no controls.
+const NOW = 1_000;
+const inv = (over) => {
+  const row = { id: 'i1', email: 'a@example.com', note: null, invitedBy: 'o@example.com', createdAt: 1, expiresAt: NOW + 10, acceptedAt: null, revokedAt: null, emailStatus: 'sent', ...over };
+  return { ...row, status: statusOf(row, NOW) };
+};
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const REMOVE_ARM = 'They lose saved plans right away. Their plans stay, and Restore brings them back.';
 const REMOVE_DONE = "Removed. They can't open saved plans anymore. Their plans are kept, and Restore brings them back.";
@@ -46,7 +55,7 @@ describe('InviteRow', () => {
 
   it('accepted: Remove arms with the consequence, then removes', async () => {
     const user = userEvent.setup();
-    const { calls } = mount(inv({ status: 'accepted', acceptedAt: 5 }));
+    const { calls } = mount(inv({ acceptedAt: 5 }));
     expect(screen.getByText('Accepted')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Revoke' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Resend' })).toBeNull();
@@ -87,34 +96,57 @@ describe('InviteRow', () => {
 
   it('a held Enter cannot arm and confirm in one gesture', async () => {
     const user = userEvent.setup();
-    const { calls } = mount(inv({ status: 'accepted', acceptedAt: 5 }));
+    const { calls } = mount(inv({ acceptedAt: 5 }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
     await user.click(screen.getByRole('button', { name: 'Really remove?' }));
     expect(calls).toHaveLength(0);
   });
 
   it('revoked after accept reads Removed with Restore only', () => {
-    mount(inv({ status: 'revoked', acceptedAt: 5, revokedAt: 6 }));
+    mount(inv({ acceptedAt: 5, revokedAt: 6 }));
     expect(screen.getByText('Removed')).toBeInTheDocument();
     expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['Restore']);
   });
 
   it('revoked before accept reads Revoked', () => {
-    mount(inv({ status: 'revoked', revokedAt: 6 }));
+    mount(inv({ revokedAt: 6 }));
     expect(screen.getByText('Revoked')).toBeInTheDocument();
     expect(screen.queryByText('Removed')).toBeNull();
   });
 
   it('keyboard focus lands on the new first control after a status change', async () => {
     const user = userEvent.setup();
-    const { update } = mount(inv({ status: 'accepted', acceptedAt: 5 }));
+    const { update } = mount(inv({ acceptedAt: 5 }));
     await user.click(screen.getByRole('button', { name: 'Remove' }));
     await wait(400);
     screen.getByRole('button', { name: 'Really remove?' }).focus();
     await user.keyboard('{Enter}');
     await screen.findByText(REMOVE_DONE);
-    update(inv({ status: 'revoked', acceptedAt: 5, revokedAt: 6 }));
+    update(inv({ acceptedAt: 5, revokedAt: 6 }));
     const restore = await screen.findByRole('button', { name: 'Restore' });
     expect(restore).toHaveFocus();
+  });
+
+  it('a pending invite whose email failed says so, with Resend and Revoke', () => {
+    mount(inv({ emailStatus: 'failed' }));
+    expect(screen.getByText('Invited')).toBeInTheDocument();
+    expect(screen.getByText('The email did not go out, but the invitation stands. Press Resend.')).toBeInTheDocument();
+    expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['Resend', 'Revoke']);
+  });
+
+  it('expired: Resend and Revoke, no expiry date', () => {
+    mount(inv({ expiresAt: NOW - 1 }));
+    expect(screen.getByText('Expired')).toBeInTheDocument();
+    expect(screen.queryByText(/Expires/)).toBeNull();
+    expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['Resend', 'Revoke']);
+  });
+
+  it('every status the server can return has a label and at least one control', () => {
+    for (const over of [{}, { expiresAt: NOW - 1 }, { acceptedAt: 5 }, { revokedAt: 6 }, { acceptedAt: 5, revokedAt: 6 }]) {
+      const { unmount, container } = mount(inv(over));
+      expect(container.querySelector('.invite-pill').textContent).not.toBe('');
+      expect(screen.getAllByRole('button').length).toBeGreaterThan(0);
+      unmount();
+    }
   });
 });

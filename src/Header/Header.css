@@ -21,13 +21,13 @@
   padding: 0;
   border: none;
   border-radius: 5px;
-  box-shadow: 1px 1px 1px #b7b7b7;
-  background-color: #000000;
-  color: #ffffff;
+  box-shadow: 1px 1px 1px var(--pause-drop);
+  background-color: var(--pause-ink);
+  color: var(--pause-paper);
 }
 
 .fleet-trigger.pause-fleet-trigger:hover {
-  background-color: #333333;
+  background-color: var(--pause-ink-hover);
 }
 
 .fleet-trigger.pause-fleet-trigger:active {
@@ -35,6 +35,6 @@
 }
 
 .fleet-trigger.pause-fleet-trigger:focus-visible {
-  outline: 2px solid #000000;
+  outline: 2px solid var(--pause-ink);
   outline-offset: 3px;
 }

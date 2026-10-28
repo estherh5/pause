@@ -149,7 +149,7 @@ function FeedbackForm({ onClose }) {
 FeedbackForm.propTypes = { onClose: PropTypes.func.isRequired };
 
 function MySubmissions({ onClose }) {
-  const { data: items, isLoading, isError } = useQuery({ queryKey: ['my-feedback'], queryFn: api.listFeedback });
+  const { data: items, isLoading, isError, isFetching, refetch } = useQuery({ queryKey: ['my-feedback'], queryFn: api.listFeedback });
   const [openIds, setOpenIds] = useState(() => new Set());
 
   function toggle(id) {
@@ -163,7 +163,12 @@ function MySubmissions({ onClose }) {
 
   let body;
   if (isLoading) body = <p className="pause-muted">Loading…</p>;
-  else if (isError) body = <p className="pause-error">Couldn&apos;t load your feedback.</p>;
+  else if (isError) body = (
+    <div className="pause-access">
+      <p role="alert" className="pause-error">Couldn&apos;t load your feedback.</p>
+      <button type="button" className="pause-quiet" aria-disabled={isFetching} onClick={() => !isFetching && refetch()}>{isFetching ? 'Trying…' : 'Try again'}</button>
+    </div>
+  );
   else if (!items || items.length === 0) body = <p className="pause-muted">Anything you send shows up here, along with the reply.</p>;
   else {
     body = (

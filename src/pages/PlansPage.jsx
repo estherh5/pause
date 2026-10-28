@@ -189,7 +189,7 @@ export default function PlansPage({ me }) {
         <ul className="plan-list" aria-busy="true">{[0, 1, 2].map((i) => <li key={i} className="plan-row"><div className="pause-skeleton" style={{ inlineSize: `${60 - i * 10}%` }} /></li>)}</ul>
       ) : plans.isError ? (
         <div className="pause-access">
-          <p>{"Your plans didn't load."}</p>
+          <p role="alert" className="pause-error">{"Your plans didn't load."}</p>
           <button type="button" className="pause-quiet" onClick={() => plans.refetch()}>Try again</button>
         </div>
       ) : plans.data.length === 0 ? (

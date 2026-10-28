@@ -21,7 +21,7 @@
 
 .day-container.week, .day-container.month {
   padding: 15px;
-  border-color: #dcdcdc;
+  border-color: var(--pause-rule);
   border-style: solid;
   border-width: 1px;
   margin-top: -1px;

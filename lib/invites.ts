@@ -127,18 +127,7 @@ export async function acceptInvite(token: string, sessionEmail: string, now: num
   return { ok: true, email: row.email };
 }
 
-/** Owner-facing status, derived from the row rather than stored — a stored
- *  status is a second source of truth that drifts from the timestamps. */
-export type InviteStatus = 'invited' | 'accepted' | 'expired' | 'revoked' | 'removed';
-
-export function statusOf(row: InviteRow, now: number): InviteStatus {
-  if (row.revokedAt != null) return row.acceptedAt != null ? 'removed' : 'revoked';
-  // Accepted before expired: the invite row IS the account, and expiry only
-  // limits the link, never a member who already used it.
-  if (row.acceptedAt != null) return 'accepted';
-  if (row.expiresAt <= now) return 'expired';
-  return 'invited';
-}
+export { statusOf, type InviteStatus } from './invite-status.js';
 
 export async function listInvites(): Promise<InviteRow[]> {
   return db.select().from(invites).orderBy(desc(invites.createdAt));

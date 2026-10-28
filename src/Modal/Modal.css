@@ -46,7 +46,7 @@
 }
 
 .modal-header {
-  border-bottom: 1px #dcdcdc solid;
+  border-bottom: 1px var(--pause-rule) solid;
   padding-bottom: 10px;
   margin: 15px;
   font-size: 20px;
@@ -111,7 +111,9 @@
 }
 
 .link-container button {
+  flex: none;
   inline-size: 44px;
+  min-inline-size: 44px;
   block-size: 44px;
   font-size: 13px;
   padding: 0;
@@ -121,7 +123,7 @@
 }
 
 .link-container button:hover {
-  text-shadow: 0.2px 0.2px 0px #000000;
+  text-shadow: 0.2px 0.2px 0px var(--pause-ink);
 }
 
 .modal-note {

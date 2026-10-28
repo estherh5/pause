@@ -23,6 +23,10 @@ export function ConfirmProvider({ children }) {
     resolver.current?.(v);
     resolver.current = null;
     setOpts(null);
+    // Close before focusing: while a modal <dialog> is open the rest of the page
+    // is inert, so focus() on the opener does nothing and the unmount then drops
+    // focus to <body>.
+    if (dialogRef.current?.open) dialogRef.current.close();
     opener.current?.focus?.();
   }, []);
 

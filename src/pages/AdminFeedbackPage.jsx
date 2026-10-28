@@ -119,10 +119,10 @@ function Inbox() {
   return (
     <>
       <p><a className="pause-link pause-tap" href="/settings">Settings</a></p>
-      {isLoading && <div className="pause-skeleton" aria-hidden="true" />}
+      {isLoading && <div className="pause-skeleton" role="status" aria-busy="true" aria-label="Loading feedback" />}
       {isError && (
         <div className="pause-access">
-          <p className="pause-error">Couldn&apos;t load feedback.</p>
+          <p role="alert" className="pause-error">Couldn&apos;t load feedback.</p>
           <button type="button" className="pause-quiet" aria-disabled={isFetching} onClick={() => !isFetching && refetch()}>{isFetching ? 'Trying…' : 'Try again'}</button>
         </div>
       )}

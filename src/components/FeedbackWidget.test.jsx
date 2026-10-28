@@ -62,4 +62,16 @@ describe('FeedbackWidget', () => {
     await user.click(within(screen.getByRole('dialog')).getByRole('tab', { name: 'My submissions' }));
     expect(await screen.findByText('Anything you send shows up here, along with the reply.')).toBeInTheDocument();
   });
+
+  it('My submissions failing to load offers Try again, which recovers', async () => {
+    const user = userEvent.setup();
+    let up = false;
+    renderApp({ me: member, routes: { '/api/feedback': () => (up ? jsonResponse([]) : new Response('{}', { status: 500 })) } });
+    await user.click(await screen.findByRole('button', { name: 'Send feedback' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('tab', { name: 'My submissions' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't load your feedback.");
+    up = true;
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText('Anything you send shows up here, along with the reply.')).toBeInTheDocument();
+  });
 });

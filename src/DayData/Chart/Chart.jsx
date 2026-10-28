@@ -91,6 +91,9 @@ function Chart({
     },
     responsive: true,
     maintainAspectRatio: false,
+    // The page has no motion anywhere else; a reduced-motion visitor gets the
+    // chart drawn in place.
+    ...(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? { animation: false } : {}),
   };
 
   if (chartType === 'bar') {

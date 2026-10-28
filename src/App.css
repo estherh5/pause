@@ -131,15 +131,15 @@
   padding: 7px;
   border-radius: 5px;
   margin: 5px;
-  box-shadow: 1px 1px 1px #b7b7b7;
+  box-shadow: 1px 1px 1px var(--pause-drop);
   visibility: visible;
-  background-color: #0edc00;
+  background-color: var(--pause-green);
   font-size: 17px;
   color: var(--pause-ink);
 }
 
 #save:hover, #save:disabled {
-  background-color: #0db902;
+  background-color: var(--pause-green-hover);
 }
 
 #save:active, #save:disabled {

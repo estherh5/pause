@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api.js';
+import { INVITE_STATUSES } from '../../lib/invite-status.ts';
 import './admin.css';
 
 // A tap arms the control, a second tap within the window confirms it.
@@ -28,15 +29,16 @@ function errorText(err) {
   }
 }
 
-const STATUS_LABEL = { pending: 'Invited', accepted: 'Accepted', expired: 'Expired', revoked: 'Revoked' };
+/** Keyed by the server's `statusOf` union (lib/invite-status.ts). */
+const STATUS_LABEL = { invited: 'Invited', accepted: 'Accepted', expired: 'Expired', revoked: 'Revoked', removed: 'Removed' };
 const when = (ms) => new Date(ms).toLocaleDateString();
 
 /**
  * One invitation in the owner's list (DESIGN.md "Removing a member").
- *  - pending / expired: Resend, Revoke (two taps)
+ *  - invited / expired: Resend, Revoke (two taps)
  *  - accepted: Remove, never "Revoke": removing a person is a different act
  *    from cancelling an unused invitation, and the label says which
- *  - revoked: Restore only, labeled "Removed" when it had been accepted
+ *  - revoked (never accepted) / removed (was a member): Restore only
  * A successful action changes the status, which swaps the control set and would
  * drop keyboard focus to <body>; focus moves to the row's first enabled control.
  */
@@ -98,22 +100,23 @@ export default function InviteRow({ inv }) {
     run(kind, () => api.revokeInvite(inv.id), doneText);
   }
 
-  const removed = inv.status === 'revoked' && inv.acceptedAt != null;
+  const removed = inv.status === 'removed';
+  const restorable = inv.status === 'revoked' || removed;
   const removable = inv.status === 'accepted';
-  const resendable = inv.status === 'pending' || inv.status === 'expired';
-  const label = removed ? 'Removed' : STATUS_LABEL[inv.status];
+  const resendable = inv.status === 'invited' || inv.status === 'expired';
+  const label = STATUS_LABEL[inv.status];
   const warn = resendable && (inv.emailStatus === 'failed' || inv.emailStatus === 'skipped');
 
   return (
     <li className="invite-row">
       <div className="invite-head">
         <span className="invite-email">{inv.email}</span>
-        <span className={`invite-pill invite-pill-${removed ? 'removed' : inv.status}`}>{label}</span>
+        <span className={`invite-pill invite-pill-${inv.status}`}>{label}</span>
       </div>
       <p className="invite-meta pause-muted">
         {inv.status === 'accepted' && inv.acceptedAt != null && `Joined ${when(inv.acceptedAt)}`}
-        {resendable && `Sent ${when(inv.createdAt)}${inv.status === 'pending' ? ` · Expires ${when(inv.expiresAt)}` : ''}`}
-        {inv.status === 'revoked' && `${removed ? 'Removed' : 'Revoked'} ${when(inv.revokedAt ?? inv.createdAt)}`}
+        {resendable && `Sent ${when(inv.createdAt)}${inv.status === 'invited' ? ` · Expires ${when(inv.expiresAt)}` : ''}`}
+        {restorable && `${label} ${when(inv.revokedAt ?? inv.createdAt)}`}
       </p>
       {inv.note && <p className="invite-note">{inv.note}</p>}
       {warn && (
@@ -142,7 +145,7 @@ export default function InviteRow({ inv }) {
             {busyKind === 'remove' ? 'Removing…' : armed ? 'Really remove?' : 'Remove'}
           </button>
         )}
-        {inv.status === 'revoked' && (
+        {restorable && (
           <button type="button" className="pause-quiet" disabled={busy}
             onClick={() => run('restore', () => api.restoreInvite(inv.id), 'Restored.')}>
             {busyKind === 'restore' ? 'Restoring…' : 'Restore'}
@@ -165,7 +168,7 @@ InviteRow.propTypes = {
     id: PropTypes.string.isRequired,
     email: PropTypes.string.isRequired,
     note: PropTypes.string,
-    status: PropTypes.oneOf(['pending', 'accepted', 'expired', 'revoked']).isRequired,
+    status: PropTypes.oneOf(INVITE_STATUSES).isRequired,
     emailStatus: PropTypes.string,
     createdAt: PropTypes.number,
     expiresAt: PropTypes.number,
