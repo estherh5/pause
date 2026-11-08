@@ -20,6 +20,13 @@
     />
 
     <script defer data-domain="pause.crystalprism.io" src="https://plausible.crystalprism.io/js/script.js"></script>
+    <script>
+      // Tells flare's daily visits email this visit is a signed-in person's.
+      window.plausible = window.plausible || function () { (window.plausible.q = window.plausible.q || []).push(arguments); };
+      fetch('/api/me').then(function (r) { return r.ok ? r.json() : null; }).then(function (me) {
+        if (me && me.state !== 'signed-out') window.plausible('signed_in', { props: { signed_in: '1' }, interactive: false });
+      }).catch(function () {});
+    </script>
 
     <title>Pause</title>
   </head>
