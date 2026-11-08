@@ -1,7 +1,6 @@
 import type { VercelRequest, VercelResponse } from '../lib/vercel.js';
-import { db } from '../db/index.js';
 import { sessionUser } from '../lib/session.js';
-import { roleForEmail } from '../lib/admission.js';
+import { admittedRole } from '../lib/api-helpers.js';
 import { withFlare } from '../lib/flare-server.js';
 
 async function handler(req: VercelRequest, res: VercelResponse) {
@@ -9,7 +8,7 @@ async function handler(req: VercelRequest, res: VercelResponse) {
   const user = await sessionUser(req);
   if (!user) { res.json({ state: 'signed-out' }); return; }
   const email = user.email.toLowerCase();
-  const role = await roleForEmail(db, email);
+  const role = await admittedRole(user);
   if (!role) { res.json({ state: 'guest', email }); return; }
   res.json({ state: role, email, name: user.name });
 }

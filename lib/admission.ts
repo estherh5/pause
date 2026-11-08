@@ -12,9 +12,11 @@ export const ownerEmail = (): string => (process.env.OWNER_EMAIL || 'hoffman.est
 
 /**
  * Gate order: owner → invite row → (users row) → baseline.
- * There is no users table: an accepted invite IS the account, so the
- * grandfathering clause is deliberately absent (DESIGN.md "Where an app has no
- * users table"). A revoked invite is a hard deny reached BEFORE the baseline,
+ * An accepted invite IS the account, so the grandfathering clause is
+ * deliberately absent (DESIGN.md "Where an app has no users table"). The
+ * `users` table is a visit log for flare's roster (lib/last-active.ts), written
+ * only AFTER this returns a role, and never read here: a row in it must not
+ * admit anyone. A revoked invite is a hard deny reached BEFORE the baseline,
  * so Remove keeps working even if the baseline is ever opened.
  */
 export async function roleForEmail(db: DB, email: string | null): Promise<Role | null> {

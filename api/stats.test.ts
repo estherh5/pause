@@ -4,7 +4,7 @@ import { callHandler } from '../test/http.js';
 
 const h = vi.hoisted(() => ({ db: null as never, email: null as string | null }));
 vi.mock('../db/index.js', () => ({ get db() { return h.db; } }));
-vi.mock('../lib/session.js', () => ({ sessionEmail: async () => h.email, sessionUser: async () => null }));
+vi.mock('../lib/session.js', () => ({ sessionEmail: async () => h.email, sessionUser: async () => (h.email ? { email: h.email, name: null } : null) }));
 const handler = (await import('./stats.js')).default;
 
 beforeEach(async () => { h.db = (await makeMigratedDb()) as never; h.email = 'hoffman.esther@gmail.com'; });

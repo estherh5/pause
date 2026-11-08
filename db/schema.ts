@@ -34,7 +34,9 @@ export const plans = sqliteTable(
 );
 
 // Admission is by email on the shared crystalprism session: the owner, or a row here
-// that is accepted and not revoked. There is no users table.
+// that is accepted and not revoked. `users` below is NOT an admission source: it
+// only records admitted people as they visit (for flare's roster), so nothing
+// may ever read it to grant access.
 export const invites = sqliteTable('invites', {
   id: text('id').primaryKey(),
   // Lowercased at every write. This is what ADMITS: the token only selects
@@ -93,7 +95,22 @@ export const feedbackMessages = sqliteTable(
   (t) => [index('idx_feedback_messages_feedback').on(t.feedbackId, t.createdAt)],
 );
 
+// One row per ADMITTED person (owner or accepted invitee), upserted on their
+// authenticated API requests by lib/last-active.ts and pushed hourly to flare's
+// fleet roster by api/cron/roster.ts. Keyed by the lowercased session email,
+// which is pause's only per-person identity. Written only after
+// lib/admission.ts#roleForEmail returns a role, so a signed-in guest never gets
+// a row. Both timestamps are raw epoch-ms integers (not `timestamp_ms`), so they
+// leave for flare as the numbers flare/lib/roster-schema.ts requires.
+export const users = sqliteTable('users', {
+  email: text('email').primaryKey(),
+  name: text('name'),
+  createdAt: integer('created_at').notNull(),
+  lastActiveAt: integer('last_active_at'),
+});
+
 export type PlanRow = typeof plans.$inferSelect;
 export type InviteRow = typeof invites.$inferSelect;
 export type FeedbackRow = typeof feedback.$inferSelect;
 export type FeedbackMessageRow = typeof feedbackMessages.$inferSelect;
+export type UserRow = typeof users.$inferSelect;

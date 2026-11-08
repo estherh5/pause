@@ -11,6 +11,7 @@
     { "source": "/api/feedback/:id", "destination": "/api/feedback?id=:id" },
     { "source": "/((?!api/|@)[^.]*)", "destination": "/index.html" }
   ],
+  "crons": [{ "path": "/api/cron/roster", "schedule": "43 * * * *" }],
   "git": { "deploymentEnabled": { "flare/*": false, "dependabot/**": false } },
   "headers": [
     {

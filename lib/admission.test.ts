@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { makeMigratedDb } from '../test/db-from-migrations.js';
-import { invites } from '../db/schema.js';
+import { invites, users } from '../db/schema.js';
 import { DEFAULT_OPEN, roleForEmail } from './admission.js';
 
 let db: Awaited<ReturnType<typeof makeMigratedDb>>;
@@ -9,7 +9,7 @@ const invite = (email: string, extra: Partial<typeof invites.$inferInsert> = {})
 
 beforeEach(async () => { db = await makeMigratedDb(); delete process.env.OWNER_EMAIL; });
 
-describe('roleForEmail: owner → invite row → (no users table) → baseline', () => {
+describe('roleForEmail: owner → invite row → baseline (users never admits)', () => {
   it('owner by default address, case-insensitive', async () => {
     expect(await roleForEmail(db, 'Hoffman.Esther@Gmail.com')).toBe('owner');
   });
@@ -24,6 +24,10 @@ describe('roleForEmail: owner → invite row → (no users table) → baseline',
   it('revoked after acceptance → null (hard deny before the baseline)', async () => {
     await invite('friend@example.com', { acceptedAt: 5, revokedAt: 6 });
     expect(await roleForEmail(db, 'friend@example.com')).toBeNull();
+  });
+  it('a users row alone never admits (it is a visit log, not an account)', async () => {
+    await db.insert(users).values({ email: 'stranger@example.com', name: null, createdAt: 1, lastActiveAt: 1 });
+    expect(await roleForEmail(db, 'stranger@example.com')).toBeNull();
   });
   it('no invite → null, because the baseline is closed', async () => {
     expect(DEFAULT_OPEN).toBe(false);
