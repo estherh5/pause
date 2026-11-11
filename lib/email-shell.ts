@@ -687,7 +687,9 @@ export function renderEmailShell(
     + metaLinkHtml
     // `body` is trusted HTML from the caller, interpolated verbatim —
     // every other part above is a caller-supplied *string* and is escaped.
-    + `<div style="margin:16px 0 0">${parts.body}</div>`
+    // The body font and ink live on the slot, so a body <p> that sets neither inherits the
+    // email's face instead of the client's serif default.
+    + `<div class="${cls("ink")}" style="margin:16px 0 0;font-family:${t.body};color:${t.ink}">${parts.body}</div>`
     + ctaHtml
     // Footer
     + `<div class="${cls('hairline')}" style="border-top:1px solid ${t.hairline};margin-top:24px;padding-top:0;mso-padding-alt:12px 0 0">`
