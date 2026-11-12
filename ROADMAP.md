@@ -33,8 +33,8 @@ Committed doc, not scratch. Kept current by hand as work ships.
 
 ## Next
 
-- [from 2026-11-17] **Upgrade eslint and @eslint/js to 10.** Held 2026-10-05: eslint-plugin-react 7.37.5 (latest) declares peer `eslint: ^3 || ... || ^9.7`, so it does not support eslint 10 (Dependabot #67, #68). Retry when eslint-plugin-react publishes a release whose peerDependencies include eslint ^10; Dependabot now ignores eslint/@eslint/js 10 (see Declined), so upgrade by hand: `npm install -D eslint@10 @eslint/js@10`. Rechecked 2026-10-17: `eslint-plugin-react` 7.37.5 is still the latest and still caps at eslint `^9.7`.
-- [from 2026-11-14] **Move back to TypeScript 7** once typescript-eslint supports it: `npm view typescript-eslint peerDependencies` lists a `typescript` range that includes 7. Then drop the `typescript` major ignore in `.github/dependabot.yml`.
+- [from 2026-11-17] **Upgrade eslint and @eslint/js to 10.** Held 2026-10-05: eslint-plugin-react 7.37.5 (latest) declares peer `eslint: ^3 || ... || ^9.7`, so it does not support eslint 10 (Dependabot #67, #68). Retry when eslint-plugin-react publishes a release whose peerDependencies include eslint ^10; Dependabot now ignores eslint/@eslint/js 10 (see Declined), so upgrade by hand: `npm install -D eslint@10 @eslint/js@10`. Rechecked 2026-10-17: `eslint-plugin-react` 7.37.5 is still the latest and still caps at eslint `^9.7`. **Model: Sonnet 5.5.** A dependency bump once the upstream version cap lifts; mechanical.
+- [from 2026-11-14] **Move back to TypeScript 7** once typescript-eslint supports it: `npm view typescript-eslint peerDependencies` lists a `typescript` range that includes 7. Then drop the `typescript` major ignore in `.github/dependabot.yml`. **Model: Sonnet 5.5.** A dependency bump once the upstream version cap lifts; mechanical.
 
 ## Declined
 
@@ -43,4 +43,4 @@ Committed doc, not scratch. Kept current by hand as work ships.
 
 ## Open questions
 
-- [from 2026-12-01] [needs data] **Should almanac read pause's saved plans as a source (pause to almanac)?** Deferred 2026-10-13 until real saved plans exist; none did then. Only `timeUnit: 'month'` plans carry a date (`month`, `year` in `db/schema.ts#plans`); day and week plans are undated templates, so only month plans could be set beside what actually happened. Cost if yes: roughly 2h on almanac's side (read `~/blob-backups/db/pause.sql`, filter to her `owner_email`), nothing on pause's. Settle by counting her saved month plans in that dump: if she keeps making them, yes; if not, decline.
+- [from 2026-12-01] [needs data] **Should almanac read pause's saved plans as a source (pause to almanac)?** Deferred 2026-10-13 until real saved plans exist; none did then. Only `timeUnit: 'month'` plans carry a date (`month`, `year` in `db/schema.ts#plans`); day and week plans are undated templates, so only month plans could be set beside what actually happened. Cost if yes: roughly 2h on almanac's side (read `~/blob-backups/db/pause.sql`, filter to her `owner_email`), nothing on pause's. Settle by counting her saved month plans in that dump: if she keeps making them, yes; if not, decline. **Model: Sonnet 5.5.** Settling it is a count of her saved month plans in the backup dump.
