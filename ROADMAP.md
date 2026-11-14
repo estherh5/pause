@@ -34,7 +34,7 @@ Committed doc, not scratch. Kept current by hand as work ships.
 ## Next
 
 - [from 2026-11-17] **Upgrade eslint and @eslint/js to 10.** Held 2026-10-05: eslint-plugin-react 7.37.5 (latest) declares peer `eslint: ^3 || ... || ^9.7`, so it does not support eslint 10 (Dependabot #67, #68). Retry when eslint-plugin-react publishes a release whose peerDependencies include eslint ^10; Dependabot now ignores eslint/@eslint/js 10 (see Declined), so upgrade by hand: `npm install -D eslint@10 @eslint/js@10`. Rechecked 2026-10-17: `eslint-plugin-react` 7.37.5 is still the latest and still caps at eslint `^9.7`. **Model: Sonnet 5.5.** A dependency bump once the upstream version cap lifts; mechanical.
-- [from 2026-11-14] **Move back to TypeScript 7** once typescript-eslint supports it: `npm view typescript-eslint peerDependencies` lists a `typescript` range that includes 7. Then drop the `typescript` major ignore in `.github/dependabot.yml`. **Model: Sonnet 5.5.** A dependency bump once the upstream version cap lifts; mechanical.
+- [from 2026-11-28] **Move back to TypeScript 7** once typescript-eslint supports it: `npm view typescript-eslint peerDependencies` lists a `typescript` range that includes 7. Then drop the `typescript` major ignore in `.github/dependabot.yml`. **Model: Sonnet 5.5.** A dependency bump once the upstream version cap lifts; mechanical.
 
 ## Declined
 
