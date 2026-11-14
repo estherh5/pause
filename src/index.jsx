@@ -5,7 +5,10 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
 import { FlareBoundary } from './components/FlareBoundary.jsx';
 import { FleetFooter } from './components/FleetFooter';
+import { installStaleChunkReload } from './lib/stale-chunk-reload.js';
 import './index.css';
+
+installStaleChunkReload();
 
 // One retry, not three with backoff: a failed load otherwise sits on its
 // skeleton for 7-8s before the error and Try again appear.
