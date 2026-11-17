@@ -21,6 +21,10 @@ describe('Save dialog', () => {
     const dialog = await openDialog(user);
     const field = dialog.getByRole('textbox', { name: 'Name' });
     expect(field.value).toMatch(/^Day plan, [A-Z][a-z]{2} \d{1,2}$/);
+    // Selected the moment the dialog opens, so the first keystroke replaces it
+    // and a later one never does.
+    expect(field).toHaveFocus();
+    expect([field.selectionStart, field.selectionEnd]).toEqual([0, field.value.length]);
     await user.clear(field);
     await user.type(field, 'Quiet Sunday');
     await user.click(dialog.getByRole('button', { name: 'Save' }));

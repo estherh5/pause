@@ -40,7 +40,11 @@ export default function SavePlanDialog({ open, onClose, onSaved }) {
     if (!d) return;
     if (open && !d.open) {
       d.showModal();
-      requestAnimationFrame(() => inputRef.current?.select());
+      // Select in the same task as showModal, never a frame later: a deferred
+      // select() can land after typing has started and make the next
+      // keystroke replace what was typed.
+      inputRef.current?.focus();
+      inputRef.current?.select();
     } else if (!open && d.open) {
       d.close();
     }
