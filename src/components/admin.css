@@ -32,8 +32,10 @@
 .invite-actions .pause-quiet:disabled { cursor: default; opacity: 0.7; }
 
 /* ---- the feedback button: bottom-left, opposite the "+" FAB ---- */
+/* Follows the screen's real bottom when iOS WebKit leaves the viewports out of step
+   (components/ViewportPin.tsx sets --vv-gap): through `bottom`, never a transform. */
 .pause-feedback-fab {
-  position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 2;
+  position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom) - var(--vv-gap, 0px)); z-index: 2;
   min-block-size: 44px; border-radius: 22px; box-shadow: 1px 1px 1px var(--pause-drop);
 }
 /* Keep the fleet footer clear of the button (44px + 16px offset + 16px air). */

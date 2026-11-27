@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { ConfirmProvider } from './components/ConfirmDialog.jsx';
 import Fab from './components/Fab.jsx';
 import FeedbackWidget from './components/FeedbackWidget.jsx';
+import ViewportPin from './components/ViewportPin';
 import Header from './Header/Header.jsx';
 import Planner from './pages/Planner.jsx';
 import { PlannerProvider } from './lib/planner-context.jsx';
@@ -42,6 +43,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
+        <ViewportPin />
         <Fab />
         {isMember(me) && <FeedbackWidget />}
       </div>

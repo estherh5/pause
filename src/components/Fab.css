@@ -1,7 +1,9 @@
+/* Follows the screen's real bottom when iOS WebKit leaves the viewports out of step
+   (components/ViewportPin.tsx sets --vv-gap): through `bottom`, never a transform. */
 .pause-fab {
   position: fixed;
   right: 16px;
-  bottom: calc(16px + env(safe-area-inset-bottom));
+  bottom: calc(16px + env(safe-area-inset-bottom) - var(--vv-gap, 0px));
   z-index: 2;
   min-block-size: 44px;
   padding: 0 18px;
